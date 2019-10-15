@@ -1,0 +1,16 @@
+{
+  "name": "num-inputs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/num-inputs.js",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^4.41.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "private": true
+}
