@@ -1,4 +1,5 @@
-const Webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack');
 const merge = require('webpack-merge');
 const common = require('./common.js');
 
@@ -17,12 +18,21 @@ module.exports = merge(common, {
     },
   },
   plugins: [
-    new Webpack.DefinePlugin({
+    new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
     }),
   ],
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        include: path.resolve(__dirname, '../src'),
+        enforce: 'pre',
+        loader: 'eslint-loader',
+        options: {
+          emitWarning: true,
+        }
+      },
       {
         test: /\.s?css$/i,
         use: [
