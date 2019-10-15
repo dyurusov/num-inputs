@@ -6,20 +6,51 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>
+    <template id="tmpl">
+      <div class="property value">
+        <span class="lbl">Value:</span>
+        <span class="val"></span>
+      </div>
+      <div class="property text">
+        <span class="lbl">Text:</span>
+        <span class="val"></span>
+      </div>
+      <div class="property valid">
+        <span class="lbl">Valid:</span>
+        <span class="val"></span>
+      </div>
+      <div class="setter value">
+        <button>Set value</button>
+        <input />
+      </div>
+      <div class="setter text">
+        <button>Set text</button>
+        <input />
+      </div>
+    </template>
     <div class="wrapper">
-      <div class="columns">
-        <div class="column" id="numInputDefault">
+      <div class="columns default">
+        <div class="column num">
+          <div class="subtitle">NumericInput</div>
+          <div id="numInputDefault"></div>
         </div>
-        <div class="column" id="calcInputDefault">
+        <div class="column calc">
+          <div class="subtitle">CalcInput</div>
+          <div id="calcInputDefault"></div>
         </div>
       </div>
       <h2>Custom style</h2>
-      <div class="columns">
-          <div class="column" id="numInputCustom">
-          </div>
-          <div class="column" id="calcInputCustom">
-          </div>
+      <div class="columns custom">
+        <div class="column num">
+          <div class="subtitle">NumericInput</div>
+          <div id="numInputCustom"></div>
+        </div>
+        <div class="column calc">
+          <div class="subtitle">CalcInput</div>
+          <div id="calcInputCustom"></div>
         </div>
       </div>
+      <button>Destroy all</button>
+    </div>
   </body>
 </html>

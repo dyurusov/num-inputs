@@ -14,3 +14,14 @@ console.log(numInputDefault);
 console.log(numInputCustom);
 console.log(calcInputDefault);
 console.log(calcInputCustom);
+
+const tmplt = document.getElementById('tmpl');
+if (tmplt) {
+  [numInputDefault, calcInputDefault].forEach(input => {
+    if (input.isMounted) {
+      const el = document.createElement('div');
+      el.append(tmplt.content.cloneNode(true));
+      input.host.after(el);
+    }
+  });
+}

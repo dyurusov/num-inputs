@@ -1,14 +1,22 @@
 export default class Input {
   constructor (elOrId) {
-    this._element = elOrId instanceof HTMLElement
+    this._host = elOrId instanceof HTMLElement
       ? elOrId
       : document.getElementById(elOrId);
-    this.render();
+    this._render();
   }
 
-  render () {
-    if (this._element) {
-      this._element.innerHTML = this._element.id;
+  _render () {
+    if (this._host) {
+      this._host.innerHTML = this._host.id;
     }
+  }
+
+  get host () {
+    return this._host;
+  }
+
+  get isMounted () {
+    return !!this.host;
   }
 }
