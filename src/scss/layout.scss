@@ -1,0 +1,40 @@
+$wrapperWidth: 640px;
+
+@mixin sm {
+  @media (min-width: #{$wrapperWidth}) {
+    @content;
+  }
+}
+
+
+.wrapper {
+  font-family: Arial;
+  margin: 0 auto;
+  padding: 1em;
+  width: $wrapperWidth;
+
+  h2 {
+    margin: 2em 0 0.5em;
+    font-weight: normal;
+  }
+
+  .columns {
+    display: block;
+
+    .column {
+      border: 1px solid lightgray;
+      margin-bottom: 1em;
+      padding: 2em 1em;
+      border-radius: 0.25em;
+      flex-grow: 1;
+    }
+
+    @include sm {
+      display: flex;
+
+      .column + .column {
+        margin-left: 1em;
+      }
+    }
+  }
+}

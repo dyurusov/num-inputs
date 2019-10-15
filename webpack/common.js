@@ -8,7 +8,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: 'num-inputs.js',
-    library: 'numInputs'
+    // library: 'numInputs'
   },
   plugins: [
     new CleanWebpackPlugin(),
