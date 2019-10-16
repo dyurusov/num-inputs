@@ -1,11 +1,11 @@
 import { InputInterface } from './input-interface';
-import { NullableNumber, EventTypes, EventType, EventListener } from './types';
+import { NullableNumber, EventTypes, EventType, EventListeners, EventListener } from './types';
 
 
 export default class NumericInput implements InputInterface {
   protected _value: NullableNumber = null;
   protected _text = '';
-  protected eventListeners: Map<EventType, Array<EventListener>> = new Map<EventType, Array<EventListener>>();
+  protected eventListeners: EventListeners = new Map();
 
 
   get value(): NullableNumber {
