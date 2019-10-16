@@ -5,6 +5,7 @@
   "main": "dist/num-inputs.js",
   "dependencies": {},
   "devDependencies": {
+    "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
     "clean-webpack-plugin": "^3.0.0",
@@ -19,12 +20,14 @@
     "eslint-plugin-standard": "^4.0.1",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^24.9.0",
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.12.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "prettier": "1.18.2",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
+    "ts-jest": "^24.1.0",
     "ts-loader": "^6.2.0",
     "typescript": "^3.6.4",
     "webpack": "^4.41.2",
@@ -36,7 +39,8 @@
     "devel": "NODE_ENV=development webpack-dev-server --config webpack/devel.js",
     "build": "NODE_ENV=production webpack --config webpack/prod.js",
     "lint": "eslint ./src",
-    "prettier": "prettier"
+    "prettier": "prettier",
+    "test": "jest"
   },
   "author": "",
   "license": "UNLICENSED",
