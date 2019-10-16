@@ -41,14 +41,13 @@ export default class NumericInput implements InputInterface {
 
   set value(value: ValueType) {
     this.trackChanges(() => {
-      if ((value === undefined) || (value === null)) {
+      const parsedValue = this.parseText(value);
+      if ((parsedValue === undefined) || (parsedValue === null)) {
         this._value = null;
         this._text = '';
       } else {
-        this._value = this.parseText(value);
-        this._text = ((this._value === undefined) || (this._value === null))
-          ? ''
-          : this._value.toString();
+        this._value = parsedValue;
+        this._text = this._value.toString();
       }
     });
   }
@@ -60,17 +59,12 @@ export default class NumericInput implements InputInterface {
 
   set text(text: string) {
     this.trackChanges(() => {
-      if ((text === null) || (text === undefined)) {
-        this._text = '';
-        this._value = null;
-      } else {
-        this._value = this.parseText(text);
-        if ((this._value === null) || (this._value === undefined)) {
-          this._text = '';
-        } else {
-          this._text = this._value.toString();
-        }
-      }
+      this._text = text;
+      const parsedValue = this.parseText(text);
+      this._value =
+        ((parsedValue === null) || (parsedValue === undefined) || (parsedValue.toString() === text)) 
+          ? parsedValue
+          : undefined;
     });
   }
 
@@ -80,7 +74,7 @@ export default class NumericInput implements InputInterface {
   }
 
 
-  protected parseText(text: string | number): number | undefined | null {
+  protected parseText(text: ValueType): number | undefined | null {
     if (text === '') {
       return null;
     }

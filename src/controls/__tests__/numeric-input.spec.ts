@@ -98,7 +98,22 @@ describe('NumericInput', () => {
       expect(input.text).toBe('45');
       expect(input.isValid).toBe(true);
 
+      input.value = '45.77.90';
+      expect(input.value).toBe(45.77);
+      expect(input.text).toBe('45.77');
+      expect(input.isValid).toBe(true);
+
+      input.value = '-1.4t';
+      expect(input.value).toBe(-1.4);
+      expect(input.text).toBe('-1.4');
+      expect(input.isValid).toBe(true);
+
       input.value = null;
+      expect(input.value).toBe(null);
+      expect(input.text).toBe('');
+      expect(input.isValid).toBe(true);
+
+      input.value = 'null';
       expect(input.value).toBe(null);
       expect(input.text).toBe('');
       expect(input.isValid).toBe(true);
@@ -123,22 +138,28 @@ describe('NumericInput', () => {
       expect(input.text).toBe('-40.78');
       expect(input.isValid).toBe(true);
 
+      input.text = '45.56df';
+      expect(input.value).toBe(undefined);
+      expect(input.text).toBe('45.56df');
+      expect(input.isValid).toBe(false);
+
+      input.text = '-f45.56df';
+      expect(input.value).toBe(undefined);
+      expect(input.text).toBe('-f45.56df');
+      expect(input.isValid).toBe(false);
+
       input.text = '45';
       expect(input.value).toBe(45);
       expect(input.text).toBe('45');
       expect(input.isValid).toBe(true);
 
-      input.text = '45.56df';
-      expect(input.value).toBe(45.56);
-      expect(input.text).toBe('45.56');
-      expect(input.isValid).toBe(true);
-
-      input.text = '-f45.56df';
+      input.text = '-545.56.8';
       expect(input.value).toBe(undefined);
-      expect(input.text).toBe('');
+      expect(input.text).toBe('-545.56.8');
       expect(input.isValid).toBe(false);
     });
   });
+
 
   describe('events', () => {
     it('should emit events on value change', () => {
@@ -151,24 +172,18 @@ describe('NumericInput', () => {
       input.on('isValidChanged', isValidChangedListener);
 
       input.value = 'asd';
-      expect(valueChangedListener.mock.calls.length).toBe(1);
-      expect(valueChangedListener.mock.calls[0].length).toBe(1);
-      expect(valueChangedListener.mock.calls[0][0]).toBe(undefined);
+      expect(valueChangedListener.mock.calls.length).toBe(0);
       expect(textChangedListener.mock.calls.length).toBe(0);
-      expect(isValidChangedListener.mock.calls.length).toBe(1);
-      expect(isValidChangedListener.mock.calls[0].length).toBe(1);
-      expect(isValidChangedListener.mock.calls[0][0]).toBe(false);
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
 
       input.value = 2;
-      expect(valueChangedListener.mock.calls.length).toBe(2);
-      expect(valueChangedListener.mock.calls[1].length).toBe(1);
-      expect(valueChangedListener.mock.calls[1][0]).toBe(2);
+      expect(valueChangedListener.mock.calls.length).toBe(1);
+      expect(valueChangedListener.mock.calls[0].length).toBe(1);
+      expect(valueChangedListener.mock.calls[0][0]).toBe(2);
       expect(textChangedListener.mock.calls.length).toBe(1);
       expect(textChangedListener.mock.calls[0].length).toBe(1);
       expect(textChangedListener.mock.calls[0][0]).toBe('2');
-      expect(isValidChangedListener.mock.calls.length).toBe(2);
-      expect(isValidChangedListener.mock.calls[1].length).toBe(1);
-      expect(isValidChangedListener.mock.calls[1][0]).toBe(true);
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
     });
 
     it('should not emit events on the same value change', () => {
@@ -217,24 +232,20 @@ describe('NumericInput', () => {
       expect(valueChangedListener.mock.calls[1][0]).toBe(undefined);
       expect(textChangedListener.mock.calls.length).toBe(2);
       expect(textChangedListener.mock.calls[1].length).toBe(1);
-      expect(textChangedListener.mock.calls[1][0]).toBe('');
+      expect(textChangedListener.mock.calls[1][0]).toBe('wwe');
       expect(isValidChangedListener.mock.calls.length).toBe(1);
       expect(isValidChangedListener.mock.calls[0].length).toBe(1);
       expect(isValidChangedListener.mock.calls[0][0]).toBe(false);
 
       input.text = '-3.06r';
-      expect(valueChangedListener.mock.calls.length).toBe(3);
-      expect(valueChangedListener.mock.calls[2].length).toBe(1);
-      expect(valueChangedListener.mock.calls[2][0]).toBe(-3.06);
+      expect(valueChangedListener.mock.calls.length).toBe(2);
       expect(textChangedListener.mock.calls.length).toBe(3);
       expect(textChangedListener.mock.calls[2].length).toBe(1);
-      expect(textChangedListener.mock.calls[2][0]).toBe('-3.06');
-      expect(isValidChangedListener.mock.calls.length).toBe(2);
-      expect(isValidChangedListener.mock.calls[1].length).toBe(1);
-      expect(isValidChangedListener.mock.calls[1][0]).toBe(true);
+      expect(textChangedListener.mock.calls[2][0]).toBe('-3.06r');
+      expect(isValidChangedListener.mock.calls.length).toBe(1);
     });
 
-    it('should not emit events on text change', () => {
+    it('should not emit events on the same text change', () => {
       const valueChangedListener = jest.fn();
       const textChangedListener = jest.fn();
       const isValidChangedListener = jest.fn();
