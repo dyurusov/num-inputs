@@ -1,11 +1,11 @@
 import { InputInterface } from './input-interface';
-import { NullableNumber, Events, EventListeners, EventListener } from './types';
+import { NullableNumber, EventTypes, EventType, EventListener } from './types';
 
 
 export default class NumericInput implements InputInterface {
   protected _value: NullableNumber = null;
-  protected _text: string = '';
-  protected eventListeners: EventListeners = {};
+  protected _text = '';
+  protected eventListeners: Map<EventType, Array<EventListener>> = new Map<EventType, Array<EventListener>>();
 
 
   get value(): NullableNumber {
@@ -61,30 +61,27 @@ export default class NumericInput implements InputInterface {
     };
     setter();
     if (prevValues.value !== this.value) {
-      this.emit(Events.valueChanged, this.value);
+      this.emit(EventTypes.valueChanged, this.value);
     }
     if (prevValues.text !== this.text) {
-      this.emit(Events.textChanged, this.text);
+      this.emit(EventTypes.textChanged, this.text);
     }
     if (prevValues.isValid !== this.isValid) {
-      this.emit(Events.isValidChanged, this.isValid);
+      this.emit(EventTypes.isValidChanged, this.isValid);
     }
   }
 
-  on(event: Events | string, listener: EventListener): void {
+  on(event: EventType, listener: EventListener): void {
     // if (this.isMounted) {
-    const key = <Events>event;
-    if (!this.eventListeners[key]) {
-      this.eventListeners[key] = [];
-    }
-    this.eventListeners[key]!.push(listener);
+    const key = event;
+    const listeners = this.eventListeners.get(key) || [];
+    listeners.push(listener);
+    this.eventListeners.set(key, listeners);
     // }
   }
 
 
-  protected emit(event: Events, newValue: any): void {
-    if (this.eventListeners[event]) {
-      this.eventListeners[event]!.forEach((listener: EventListener) => listener(newValue));
-    }
+  protected emit(event: EventType, newValue: any): void {
+    (this.eventListeners.get(event) || []).forEach((listener: EventListener) => listener(newValue));
   }
 }
