@@ -17,11 +17,7 @@ export default class NumericInput implements InputInterface {
       : document.getElementById(element);
     if (hostElement) {
       this._hostElement = hostElement;
-      this._widget = document.createElement('div');
-      this._widget.innerHTML = 'NumericInput';
-      this._widget.classList.add('numeric-input');
-      this._hostElement.append(this._widget);
-      this._isMounted = true;
+      this.mount();
     }
   }
 
@@ -117,11 +113,26 @@ export default class NumericInput implements InputInterface {
 
 
   destroy(): void {
+    this.unmount();
+  }
+
+  protected unmount(): void {
     if (this.isMounted) {
       this.eventListeners.clear();
       this._widget && this._widget.remove();
       this._widget = undefined;
       this._isMounted = false;
+    }
+  }
+
+  protected mount(): void {
+    if (this.hostElement) {
+      this._widget = document.createElement('div');
+      this._widget.innerHTML = 'NumericInput';
+      this._widget.classList.add('numeric-input');
+      this._hostElement && this._hostElement.append(this._widget);
+      this._isMounted = true;
+      this.eventListeners.clear();
     }
   }
 }

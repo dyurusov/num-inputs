@@ -46,8 +46,8 @@ describe('NumericInput', () => {
       expect(input.hostElement).toBeUndefined();
     });
 
-    it.todo('should not mount on mounted container');
     it.todo('should append content to container on munting');
+    it.todo('should not mount on mounted container');
   });
 
 
