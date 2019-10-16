@@ -5,6 +5,7 @@
   "main": "dist/num-inputs.js",
   "dependencies": {},
   "devDependencies": {
+    "@testing-library/jest-dom": "^4.1.2",
     "@types/jest": "^24.0.19",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
@@ -39,7 +40,7 @@
   "scripts": {
     "devel": "NODE_ENV=development webpack-dev-server --config webpack/devel.js",
     "build": "NODE_ENV=production webpack --config webpack/prod.js",
-    "lint": "eslint ./src",
+    "lint": "eslint --ext tsx --ext ts --ext .jsx --ext .js ./src ",
     "prettier": "prettier",
     "test": "jest",
     "test:watch": "jest --watch"

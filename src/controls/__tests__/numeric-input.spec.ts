@@ -1,10 +1,48 @@
 import NumericInput from '../numeric-input';
+import { domElementFactory } from './dom.helper';
+
+
+const contanerId = 'container-id';
+let container: any = undefined;
+
+beforeEach(() => {
+  container = domElementFactory(contanerId);
+  document.body.appendChild(container);
+});
+
+afterEach(() => {
+  if (container instanceof HTMLElement) {
+    container.remove();
+  }
+  container = undefined;
+});
 
 
 describe('NumericInput', () => {
+  describe('mounting', () => {
+    it('should be mounted on existing DOM by elemnt', () => {
+      const input = new NumericInput(container);
+      expect(input.isMounted).toBe(true);
+      expect(input.hostElement).toBe(container);
+    });
+
+    it('should be mounted on existing DOM by elemnt id', () => {
+      const input = new NumericInput(contanerId);
+      expect(input.isMounted).toBe(true);
+      expect(input.hostElement).toBe(document.getElementById(contanerId));
+    });
+
+    it('should not be mounted on nonexisting DOM by elemnt id', () => {
+      const input = new NumericInput(`${contanerId}-1`);
+      expect(input.isMounted).toBe(false);
+      expect(input.hostElement).toBeUndefined();
+    });
+  });
+
+
   describe('initialization', () => {
     it('should use default values', () => {
-      const input = new NumericInput();
+      const input = new NumericInput(container);
       expect(input.value).toBe(null);
       expect(input.text).toBe('');
       expect(input.isValid).toBe(true);
@@ -14,7 +52,7 @@ describe('NumericInput', () => {
 
   describe('properties assignment', () => {
     it('should set value properly', () => {
-      const input = new NumericInput();
+      const input = new NumericInput(container);
 
       input.value = 0;
       expect(input.value).toBe(0);
@@ -44,7 +82,7 @@ describe('NumericInput', () => {
 
 
     it('should set text properly', () => {
-      const input = new NumericInput();
+      const input = new NumericInput(container);
 
       input.text = '0';
       expect(input.value).toBe(0);
@@ -83,7 +121,7 @@ describe('NumericInput', () => {
       const valueChangedListener = jest.fn();
       const textChangedListener = jest.fn();
       const isValidChangedListener = jest.fn();
-      const input = new NumericInput();
+      const input = new NumericInput(container);
       input.on('valueChanged', valueChangedListener);
       input.on('textChanged', textChangedListener);
       input.on('isValidChanged', isValidChangedListener);
@@ -102,7 +140,7 @@ describe('NumericInput', () => {
       const valueChangedListener = jest.fn();
       const textChangedListener = jest.fn();
       const isValidChangedListener = jest.fn();
-      const input = new NumericInput();
+      const input = new NumericInput(container);
       input.value = 2;
 
       input.on('valueChanged', valueChangedListener);

@@ -3,9 +3,29 @@ import { NullableNumber, EventTypes, EventType, EventListeners, EventListener } 
 
 
 export default class NumericInput implements InputInterface {
+  protected _hostElement: HTMLElement | undefined;
   protected _value: NullableNumber = null;
   protected _text = '';
   protected eventListeners: EventListeners = new Map();
+
+
+  constructor(element: HTMLElement | string) {
+    const hostElement = element instanceof HTMLElement 
+      ? element
+      : document.getElementById(element);
+    if (hostElement) {
+      this._hostElement = hostElement;
+    }
+  }
+
+
+  get hostElement(): HTMLElement | undefined {
+    return this._hostElement;
+  }
+
+  get isMounted(): boolean {
+    return !!this.hostElement;
+  }
 
 
   get value(): NullableNumber {
