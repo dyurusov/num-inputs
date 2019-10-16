@@ -17,6 +17,9 @@ module.exports = {
       template: path.resolve(__dirname, '../src/index.html'),
     }),
   ],
+  resolve: {
+    extensions: [ '.tsx', '.ts', '.jsx', '.js' ],
+  },
   module: {
     rules: [
       {
@@ -32,6 +35,11 @@ module.exports = {
             name: '[path][name].[ext]'
           }
         }
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
     ]
   },
