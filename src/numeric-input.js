@@ -1,4 +1,4 @@
 import Input from './input';
 
-export default class NumericInput extends Input {
+export default class NumericInput implements Input {
 }
