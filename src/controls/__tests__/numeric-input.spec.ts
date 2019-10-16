@@ -150,14 +150,25 @@ describe('NumericInput', () => {
       input.on('textChanged', textChangedListener);
       input.on('isValidChanged', isValidChangedListener);
 
-      input.value = 2;
+      input.value = 'asd';
       expect(valueChangedListener.mock.calls.length).toBe(1);
       expect(valueChangedListener.mock.calls[0].length).toBe(1);
-      expect(valueChangedListener.mock.calls[0][0]).toBe(2);
+      expect(valueChangedListener.mock.calls[0][0]).toBe(undefined);
+      expect(textChangedListener.mock.calls.length).toBe(0);
+      expect(isValidChangedListener.mock.calls.length).toBe(1);
+      expect(isValidChangedListener.mock.calls[0].length).toBe(1);
+      expect(isValidChangedListener.mock.calls[0][0]).toBe(false);
+
+      input.value = 2;
+      expect(valueChangedListener.mock.calls.length).toBe(2);
+      expect(valueChangedListener.mock.calls[1].length).toBe(1);
+      expect(valueChangedListener.mock.calls[1][0]).toBe(2);
       expect(textChangedListener.mock.calls.length).toBe(1);
       expect(textChangedListener.mock.calls[0].length).toBe(1);
       expect(textChangedListener.mock.calls[0][0]).toBe('2');
-      expect(isValidChangedListener.mock.calls.length).toBe(0);
+      expect(isValidChangedListener.mock.calls.length).toBe(2);
+      expect(isValidChangedListener.mock.calls[1].length).toBe(1);
+      expect(isValidChangedListener.mock.calls[1][0]).toBe(true);
     });
 
     it('should not emit events on the same value change', () => {
@@ -170,6 +181,74 @@ describe('NumericInput', () => {
       input.on('valueChanged', valueChangedListener);
       input.on('textChanged', textChangedListener);
       input.on('isValidChanged', isValidChangedListener);
+
+      input.value = 2;
+      expect(valueChangedListener.mock.calls.length).toBe(0);
+      expect(textChangedListener.mock.calls.length).toBe(0);
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
+
+      input.text = '2';
+      expect(valueChangedListener.mock.calls.length).toBe(0);
+      expect(textChangedListener.mock.calls.length).toBe(0);
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
+    });
+
+    it('should emit events on text change', () => {
+      const valueChangedListener = jest.fn();
+      const textChangedListener = jest.fn();
+      const isValidChangedListener = jest.fn();
+      const input = new NumericInput(container);
+      input.on('valueChanged', valueChangedListener);
+      input.on('textChanged', textChangedListener);
+      input.on('isValidChanged', isValidChangedListener);
+
+      input.text = '2';
+      expect(valueChangedListener.mock.calls.length).toBe(1);
+      expect(valueChangedListener.mock.calls[0].length).toBe(1);
+      expect(valueChangedListener.mock.calls[0][0]).toBe(2);
+      expect(textChangedListener.mock.calls.length).toBe(1);
+      expect(textChangedListener.mock.calls[0].length).toBe(1);
+      expect(textChangedListener.mock.calls[0][0]).toBe('2');
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
+
+      input.text = 'wwe';
+      expect(valueChangedListener.mock.calls.length).toBe(2);
+      expect(valueChangedListener.mock.calls[1].length).toBe(1);
+      expect(valueChangedListener.mock.calls[1][0]).toBe(undefined);
+      expect(textChangedListener.mock.calls.length).toBe(2);
+      expect(textChangedListener.mock.calls[1].length).toBe(1);
+      expect(textChangedListener.mock.calls[1][0]).toBe('');
+      expect(isValidChangedListener.mock.calls.length).toBe(1);
+      expect(isValidChangedListener.mock.calls[0].length).toBe(1);
+      expect(isValidChangedListener.mock.calls[0][0]).toBe(false);
+
+      input.text = '-3.06r';
+      expect(valueChangedListener.mock.calls.length).toBe(3);
+      expect(valueChangedListener.mock.calls[2].length).toBe(1);
+      expect(valueChangedListener.mock.calls[2][0]).toBe(-3.06);
+      expect(textChangedListener.mock.calls.length).toBe(3);
+      expect(textChangedListener.mock.calls[2].length).toBe(1);
+      expect(textChangedListener.mock.calls[2][0]).toBe('-3.06');
+      expect(isValidChangedListener.mock.calls.length).toBe(2);
+      expect(isValidChangedListener.mock.calls[1].length).toBe(1);
+      expect(isValidChangedListener.mock.calls[1][0]).toBe(true);
+    });
+
+    it('should not emit events on text change', () => {
+      const valueChangedListener = jest.fn();
+      const textChangedListener = jest.fn();
+      const isValidChangedListener = jest.fn();
+      const input = new NumericInput(container);
+      input.text = '2';
+
+      input.on('valueChanged', valueChangedListener);
+      input.on('textChanged', textChangedListener);
+      input.on('isValidChanged', isValidChangedListener);
+
+      input.text = '2';
+      expect(valueChangedListener.mock.calls.length).toBe(0);
+      expect(textChangedListener.mock.calls.length).toBe(0);
+      expect(isValidChangedListener.mock.calls.length).toBe(0);
 
       input.value = 2;
       expect(valueChangedListener.mock.calls.length).toBe(0);

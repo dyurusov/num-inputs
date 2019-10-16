@@ -1,10 +1,10 @@
 import { InputInterface } from './input-interface';
-import { NullableNumber, EventTypes, EventType, EventListeners, EventListener } from './types';
+import { ValueType, EventTypes, EventType, EventListeners, EventListener } from './types';
 
 
 export default class NumericInput implements InputInterface {
   protected _hostElement?: HTMLElement;
-  protected _value: NullableNumber = null;
+  protected _value: ValueType = null;
   protected _text = '';
   protected eventListeners: EventListeners = new Map();
   protected _isMounted = false;
@@ -18,6 +18,7 @@ export default class NumericInput implements InputInterface {
     if (hostElement) {
       this._hostElement = hostElement;
       this._widget = document.createElement('div');
+      this._widget.innerHTML = 'NumericInput';
       this._widget.classList.add('numeric-input');
       this._hostElement.append(this._widget);
       this._isMounted = true;
@@ -34,18 +35,20 @@ export default class NumericInput implements InputInterface {
   }
 
 
-  get value(): NullableNumber {
+  get value(): ValueType {
     return this._value;
   }
 
-  set value(value: NullableNumber) {
+  set value(value: ValueType) {
     this.trackChanges(() => {
       if ((value === undefined) || (value === null)) {
         this._value = null;
         this._text = '';
       } else {
-        this._value = value;
-        this._text = this._value.toString();
+        this._value = this.parseText(value);
+        this._text = ((this._value === undefined) || (this._value === null))
+          ? ''
+          : this._value.toString();
       }
     });
   }
@@ -56,12 +59,19 @@ export default class NumericInput implements InputInterface {
   }
 
   set text(text: string) {
-    this._value = this.parseText(text);
-    if ((this._value === null) || (this._value === undefined)) {
-      this._text = '';
-    } else {
-      this._text = this._value.toString();
-    }
+    this.trackChanges(() => {
+      if ((text === null) || (text === undefined)) {
+        this._text = '';
+        this._value = null;
+      } else {
+        this._value = this.parseText(text);
+        if ((this._value === null) || (this._value === undefined)) {
+          this._text = '';
+        } else {
+          this._text = this._value.toString();
+        }
+      }
+    });
   }
 
 
@@ -70,11 +80,11 @@ export default class NumericInput implements InputInterface {
   }
 
 
-  protected parseText(text: string): NullableNumber {
+  protected parseText(text: string | number): number | undefined | null {
     if (text === '') {
       return null;
     }
-    const parsedValue: number = parseFloat(text);
+    const parsedValue: number = parseFloat(text as string);
     return isNaN(parsedValue) ? undefined : parsedValue;
   }
 

@@ -1,4 +1,4 @@
-export type NullableNumber = number | null | undefined;
+export type ValueType = number | null | undefined | string;
 
 export enum EventTypes {
   valueChanged = 'valueChanged',

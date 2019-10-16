@@ -1,7 +1,7 @@
-import { NullableNumber, EventType, EventListener } from './types';
+import { ValueType, EventType, EventListener } from './types';
 
 export interface InputInterface {
-  readonly value: NullableNumber;
+  readonly value: ValueType;
   text: string;
   isValid: boolean;
   readonly hostElement?: HTMLElement;

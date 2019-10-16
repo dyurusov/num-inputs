@@ -1,7 +1,7 @@
 import './scss/layout.scss';
 import './scss/default.scss';
 import './scss/custom.scss';
-import NumericInput from './numeric-input';
+import NumericInput from './controls/numeric-input';
 import CalcInput from './calc-input';
 
 
