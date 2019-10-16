@@ -3,10 +3,12 @@ import { NullableNumber, EventTypes, EventType, EventListeners, EventListener } 
 
 
 export default class NumericInput implements InputInterface {
-  protected _hostElement: HTMLElement | undefined;
+  protected _hostElement?: HTMLElement;
   protected _value: NullableNumber = null;
   protected _text = '';
   protected eventListeners: EventListeners = new Map();
+  protected _isMounted = false;
+  protected _widget?: HTMLElement;
 
 
   constructor(element: HTMLElement | string) {
@@ -15,6 +17,10 @@ export default class NumericInput implements InputInterface {
       : document.getElementById(element);
     if (hostElement) {
       this._hostElement = hostElement;
+      this._widget = document.createElement('div');
+      this._widget.classList.add('numeric-input');
+      this._hostElement.append(this._widget);
+      this._isMounted = true;
     }
   }
 
@@ -24,7 +30,7 @@ export default class NumericInput implements InputInterface {
   }
 
   get isMounted(): boolean {
-    return !!this.hostElement;
+    return this._isMounted;
   }
 
 
@@ -103,5 +109,15 @@ export default class NumericInput implements InputInterface {
 
   protected emit(event: EventType, newValue: any): void {
     (this.eventListeners.get(event) || []).forEach((listener: EventListener) => listener(newValue));
+  }
+
+
+  destroy(): void {
+    if (this.isMounted) {
+      this.eventListeners.clear();
+      this._widget && this._widget.remove();
+      this._widget = undefined;
+      this._isMounted = false;
+    }
   }
 }

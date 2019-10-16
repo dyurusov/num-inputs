@@ -1,5 +1,6 @@
 import NumericInput from '../numeric-input';
 import { domElementFactory } from './dom.helper';
+import '@testing-library/jest-dom/extend-expect';
 
 
 const contanerId = 'container-id';
@@ -23,20 +24,43 @@ describe('NumericInput', () => {
     it('should be mounted on existing DOM by elemnt', () => {
       const input = new NumericInput(container);
       expect(input.isMounted).toBe(true);
+      expect(container).not.toBeEmpty();
+      expect(container.innerHTML).not.toBe('');
       expect(input.hostElement).toBe(container);
     });
 
     it('should be mounted on existing DOM by elemnt id', () => {
       const input = new NumericInput(contanerId);
       expect(input.isMounted).toBe(true);
-      expect(input.hostElement).toBe(document.getElementById(contanerId));
+      const container = document.getElementById(contanerId);
+      expect(container).not.toBeEmpty();
+      expect(container && container.innerHTML).not.toBe('');
+      expect(input.hostElement).toBe(container);
     });
 
     it('should not be mounted on nonexisting DOM by elemnt id', () => {
       const input = new NumericInput(`${contanerId}-1`);
       expect(input.isMounted).toBe(false);
+      expect(container).toBeEmpty();
+      expect(container.innerHTML).toBe('');
       expect(input.hostElement).toBeUndefined();
     });
+
+    it.todo('should not mount on mounted container');
+    it.todo('should append content to container on munting');
+  });
+
+
+  describe('destroy', () => {
+    it('should remove host element content', () => {
+      const input = new NumericInput(container);
+      expect(input.isMounted).toBe(true);
+      input.destroy();
+      expect(input.isMounted).toBe(false);
+      expect(input.hostElement).toBeDefined();
+      const hostContainer = document.getElementById(contanerId);
+      expect(hostContainer).toBeEmpty();
+    })
   });
 
 
