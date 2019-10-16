@@ -1,0 +1,24 @@
+.number-input-widget {
+  border: 1px solid #d3d3d3;
+
+  &.has-focus {
+    border-color: #90d0e6;
+  }
+
+  &.is-invalid {
+    border-color: #f8b6c0;
+
+    &.has-focus {
+      border-color: #db2f2f;
+    }
+  }
+
+  input {
+    border: none;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+    }
+  }
+}

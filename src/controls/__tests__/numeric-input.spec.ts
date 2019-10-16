@@ -46,8 +46,57 @@ describe('NumericInput', () => {
       expect(input.hostElement).toBeUndefined();
     });
 
-    it.todo('should append content to container on munting');
     it.todo('should not mount on mounted container');
+  });
+
+
+  describe('widget', () => {
+    it('should append content to container on mounting', () => {
+      new NumericInput(container);
+      const widget = document.querySelector('.number-input-widget');
+      expect(widget).toBeInTheDocument();
+      const widgetInput = document.querySelector('.number-input-widget input');
+      expect(widgetInput).toBeInTheDocument();
+    });
+
+    it('should handle focus and blur events', () => {
+      new NumericInput(container);
+      const widget = document.querySelector('.number-input-widget');
+      const widgetInput = widget && widget.querySelector('input');
+      expect(widgetInput).not.toHaveFocus();
+      expect(widget).not.toHaveClass('has-focus');
+      widgetInput && widgetInput.focus();
+      expect(widgetInput).toHaveFocus();
+      expect(widget).toHaveClass('has-focus');
+      widgetInput && widgetInput.blur();
+      expect(widgetInput).not.toHaveFocus();
+      expect(widget).not.toHaveClass('has-focus');
+    });
+
+    it('should handle valid/invalid value', () => {
+      const input = new NumericInput(container);
+      const widget = document.querySelector('.number-input-widget');
+      expect(widget).not.toHaveClass('is-invalid');
+      input.text = '123';
+      expect(widget).not.toHaveClass('is-invalid');
+      input.text = 'abc';
+      expect(widget).toHaveClass('is-invalid');
+      input.text = '123';
+      expect(widget).not.toHaveClass('is-invalid');
+    });
+
+    it('should reflect control change', () => {
+      const input = new NumericInput(container);
+      const widget = document.querySelector('.number-input-widget');
+      const widgetInput = widget && widget.querySelector('input');
+      expect(widgetInput && widgetInput.value).toBe('');
+
+      input.value = 2;
+      expect(widgetInput && widgetInput.value).toBe('2');
+
+      input.text = 'rr';
+      expect(widgetInput && widgetInput.value).toBe('rr');
+    });
   });
 
 
@@ -157,6 +206,17 @@ describe('NumericInput', () => {
       expect(input.value).toBe(undefined);
       expect(input.text).toBe('-545.56.8');
       expect(input.isValid).toBe(false);
+
+      // TODO:
+      // input.text = '45.';
+      // expect(input.value).toBe(45);
+      // expect(input.text).toBe('45.');
+      // expect(input.isValid).toBe(true);
+
+      // input.text = '003';
+      // expect(input.value).toBe(3);
+      // expect(input.text).toBe('003');
+      // expect(input.isValid).toBe(true);
     });
   });
 

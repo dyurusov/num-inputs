@@ -2,6 +2,13 @@ import { InputInterface } from './input-interface';
 import { ValueType, EventTypes, EventType, EventListeners, EventListener } from './types';
 
 
+const widgetClassNames = {
+  widget: 'number-input-widget',
+  hasFocus: 'has-focus',
+  isInvalid: 'is-invalid',
+}
+
+
 export default class NumericInput implements InputInterface {
   protected _hostElement?: HTMLElement;
   protected _value: ValueType = null;
@@ -71,11 +78,24 @@ export default class NumericInput implements InputInterface {
 
 
   protected parseText(text: ValueType): number | undefined | null {
-    if (text === '') {
+    if ((text === '') || (text === null) || (text === undefined)) {
       return null;
     }
     const parsedValue: number = parseFloat(text as string);
     return isNaN(parsedValue) ? undefined : parsedValue;
+
+    // TODO:
+    // regexp for all cases may be too complicated and may lead to very long parsing
+    // const stringValue = (text as string).trim();
+    // // should be no spaces
+    // // should be not more then one plus or minus and it should be the first
+    // // remember sign
+    // // should be not more then one decimal point
+    // // split by decimal point
+    // // if less then one and more then to parts then invalid
+    // // if the first part exists then parseFloat and remember
+    // // if the second part exists then add decimal dot at the begonning, parseFloat and remember
+    // // add the remebered parts
   }
 
 
@@ -98,14 +118,16 @@ export default class NumericInput implements InputInterface {
   }
 
   on(event: EventType, listener: EventListener): void {
-    // if (this.isMounted) {
     const key = event;
     const listeners = this.eventListeners.get(key) || [];
     listeners.push(listener);
     this.eventListeners.set(key, listeners);
-    // }
   }
 
+  off(event: EventType, listener: EventListener): void {
+    const listeners = (this.eventListeners.get(event) || []).filter(item => item != listener);
+    this.eventListeners.set(event, listeners);
+  }
 
   protected emit(event: EventType, newValue: any): void {
     (this.eventListeners.get(event) || []).forEach((listener: EventListener) => listener(newValue));
@@ -119,6 +141,7 @@ export default class NumericInput implements InputInterface {
   protected unmount(): void {
     if (this.isMounted) {
       this.eventListeners.clear();
+      this.off(EventTypes.isValidChanged, this.updateWidget);
       this._widget && this._widget.remove();
       this._widget = undefined;
       this._isMounted = false;
@@ -127,12 +150,29 @@ export default class NumericInput implements InputInterface {
 
   protected mount(): void {
     if (this.hostElement) {
-      this._widget = document.createElement('div');
-      this._widget.innerHTML = 'NumericInput';
-      this._widget.classList.add('numeric-input');
+      this.eventListeners.clear();
+      const widget = document.createElement('div');
+      widget.classList.add(widgetClassNames.widget);
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.addEventListener('focus', () => widget.classList.add(widgetClassNames.hasFocus));
+      input.addEventListener('blur', () => widget.classList.remove(widgetClassNames.hasFocus));
+      input.addEventListener('input', () => this.text = input.value);
+      widget.append(input);
+      this.on(EventTypes.isValidChanged, this.updateWidget);
+      this.on(EventTypes.textChanged, value => (input.value = value));
+
+      this._widget = widget;
       this._hostElement && this._hostElement.append(this._widget);
       this._isMounted = true;
-      this.eventListeners.clear();
+    }
+  }
+
+  updateWidget = (isValid: boolean): void => {
+    if (isValid) {
+      this._widget && this._widget.classList.remove(widgetClassNames.isInvalid);
+    } else {
+      this._widget && this._widget.classList.add(widgetClassNames.isInvalid);
     }
   }
 }
