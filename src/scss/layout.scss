@@ -41,9 +41,14 @@ $wrapperWidth: 640px;
 
     @include sm {
       display: flex;
+      justify-content: space-around;
 
-      .column + .column {
-        margin-left: 1em;
+      .column {
+        max-width: 49%;
+
+        & + .column {
+          margin-left: 1em;
+        }
       }
     }
   }

@@ -1,5 +1,6 @@
-.number-input-widget {
+@mixin num-input-wiget {
   border: 1px solid #d3d3d3;
+  display: relative;
 
   &.has-focus {
     border-color: #90d0e6;
@@ -20,5 +21,33 @@
     &:focus {
       outline: none;
     }
+  }
+}
+
+.number-input-widget {
+  @include num-input-wiget;
+}
+
+.calc-input-widget {
+  $spanWidth: 5em;
+
+  @include num-input-wiget;
+  position: relative;
+
+  input {
+    padding-right: $spanWidth + 0.5em;
+  }
+
+  span {
+    width: $spanWidth;
+    position: absolute;
+    top:0;
+    right: 0;
+    bottom: 0;
+    background-color: lightgrey;
+    text-align: center;
+    overflow: hidden;
+    font-size: 0.9em;
+    line-height: 1.25;
   }
 }
