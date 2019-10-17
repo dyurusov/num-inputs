@@ -2,7 +2,6 @@
   "name": "num-inputs",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/num-inputs.js",
   "dependencies": {},
   "devDependencies": {
     "@testing-library/jest-dom": "^4.1.2",
@@ -45,7 +44,7 @@
     "test": "jest",
     "test:watch": "jest --watch"
   },
-  "author": "",
+  "author": "Dmitry Yurusov",
   "license": "UNLICENSED",
   "private": true
 }
