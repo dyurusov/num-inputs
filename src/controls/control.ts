@@ -17,13 +17,22 @@ export class Control extends ChangeTracker implements InputInterface {
   ) {
     super();
     this.domBuilder.bindOwner(this);
+    this._hostElement = (element instanceof HTMLElement ? element : document.getElementById(element)) || undefined;
+    this.mount();
+  }
 
-    const hostElement = element instanceof HTMLElement
-      ? element
-      : document.getElementById(element);
-    if (hostElement) {
-      this._hostElement = hostElement;
-      this.mount();
+
+  mount(): void {
+    if (this.hostElement && !this.domBuilder.isMounted) {
+      this.clearListeners();
+      this.domBuilder.mount(this.hostElement);
+    }
+  }
+
+  destroy(): void {
+    if (this.domBuilder.isMounted) {
+      this.clearListeners();
+      this.domBuilder.unmount();
     }
   }
 
@@ -34,6 +43,10 @@ export class Control extends ChangeTracker implements InputInterface {
 
   get isMounted(): boolean {
     return this.domBuilder.isMounted;
+  }
+
+  get isValid(): boolean {
+    return this._value !== undefined;
   }
 
 
@@ -77,25 +90,5 @@ export class Control extends ChangeTracker implements InputInterface {
       'text',
       'isValid',
     ]);
-  }
-
-
-  get isValid(): boolean {
-    return this._value !== undefined;
-  }
-
-
-  destroy(): void {
-    if (this.domBuilder.isMounted) {
-      this.clearListeners();
-      this.domBuilder.unmount();
-    }
-  }
-
-  mount(): void {
-    if (this.hostElement && !this.domBuilder.isMounted) {
-      this.clearListeners();
-      this.domBuilder.mount(this.hostElement);
-    }
   }
 }
