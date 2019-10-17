@@ -21,14 +21,14 @@ export class NumericParser implements ParserInterface {
     }
 
     // check for valid format and separate parts
-    const matches = trimmed.match(/^((\+|-)\s*)?(\d*)\.?(\d*)$/);
+    const matches = trimmed.match(/^(\+|-)?(\d*)\.?(\d*)$/);
     if (!matches) {
       return undefined;
     }
 
-    const sign = (matches[2] === '-') ? -1 : 1;
-    const integralPart = matches[3] ? parseFloat(matches[3]) : 0;
-    const fractionalPart = matches[4] ? parseFloat(`0.${matches[4]}`) : 0;
+    const sign = (matches[1] === '-') ? -1 : 1;
+    const integralPart = matches[2] ? parseFloat(matches[2]) : 0;
+    const fractionalPart = matches[3] ? parseFloat(`0.${matches[3]}`) : 0;
 
     return sign * (integralPart + fractionalPart) || 0; // convert -0 to 0
   }
