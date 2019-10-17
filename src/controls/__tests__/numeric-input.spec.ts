@@ -148,18 +148,29 @@ describe('NumericInput', () => {
       expect(input.isValid).toBe(true);
 
       input.value = '45.77.90';
-      expect(input.value).toBe(45.77);
-      expect(input.text).toBe('45.77');
+      expect(input.value).toBe(null);
+      expect(input.text).toBe('');
       expect(input.isValid).toBe(true);
 
       input.value = '-1.4t';
-      expect(input.value).toBe(-1.4);
-      expect(input.text).toBe('-1.4');
+      expect(input.value).toBe(null);
+      expect(input.text).toBe('');
       expect(input.isValid).toBe(true);
 
       input.value = null;
       expect(input.value).toBe(null);
       expect(input.text).toBe('');
+      expect(input.isValid).toBe(true);
+
+      // TODO:
+      // input.value = '+03.12';
+      // expect(input.value).toBe(3.12);
+      // expect(input.text).toBe('3.12');
+      // expect(input.isValid).toBe(true);
+
+      input.value = '-3.12';
+      expect(input.value).toBe(-3.12);
+      expect(input.text).toBe('-3.12');
       expect(input.isValid).toBe(true);
 
       input.value = 'null';

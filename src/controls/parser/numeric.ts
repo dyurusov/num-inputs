@@ -6,7 +6,9 @@ export class NumericParser implements ParserInterface {
       return null;
     }
     const parsedValue: number = parseFloat(value as string);
-    return isNaN(parsedValue) ? undefined : parsedValue;
+    return ((parsedValue === null) || (!isNaN(parsedValue) && (parsedValue.toString() === value.toString())))
+      ? parsedValue
+      : undefined;
 
     // TODO:
     // regexp for all cases may be too complicated and may lead to very long parsing

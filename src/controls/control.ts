@@ -75,11 +75,7 @@ export class Control extends ChangeTracker implements InputInterface {
   set text(text: string) {
     this.trackChanges(() => {
       this._text = text;
-      const parsedValue = this.parser.parse(text);
-      this._value =
-        ((parsedValue === null) || (parsedValue === undefined) || (parsedValue.toString() === text)) 
-          ? parsedValue
-          : undefined;
+      this._value = this.parser.parse(text);
     });
   }
 
