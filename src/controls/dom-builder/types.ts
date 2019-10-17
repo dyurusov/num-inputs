@@ -14,4 +14,6 @@ export type CssClassNames = {
 
 export type Options = {
   classNames?: CssClassNames,
+  invalidSign?: string,
+  [option: string]: any,
 };

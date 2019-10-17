@@ -72,6 +72,10 @@ export class NumericDomBuilder implements DomBuilderInterface {
     const textListener = (text: string): void => { input.value = text };
     this.owner && this.unsubscribers.push(this.owner.on('textChanged', textListener));
 
+    // set initial values
+    this.owner && isValidListener(this.owner.isValid);
+    this.owner && textListener(this.owner.text);
+
     return input;
   }
 }
