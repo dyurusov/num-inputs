@@ -24,7 +24,6 @@ export class Control extends ChangeTracker implements InputInterface {
 
   mount(): void {
     if (this.hostElement && !this.domBuilder.isMounted) {
-      this.clearListeners();
       this.domBuilder.mount(this.hostElement);
     }
   }
