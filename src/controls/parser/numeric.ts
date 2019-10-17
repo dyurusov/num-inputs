@@ -2,25 +2,34 @@ import { ParserInterface, ValueType, ParsedType } from './types';
 
 export class NumericParser implements ParserInterface {
   parse(value: ValueType): ParsedType {
-    if ((value === '') || (value === null) || (value === undefined)) {
+    // handle numbers and NaN
+    if (typeof value === 'number') {
+      return isNaN(value)
+        ? null
+        : (value || 0);  // convert -0 to 0
+    }
+
+    // handle undefined and null
+    if ((value === undefined) || (value === null)) {
       return null;
     }
-    const parsedValue: number = parseFloat(value as string);
-    return ((parsedValue === null) || (!isNaN(parsedValue) && (parsedValue.toString() === value.toString())))
-      ? parsedValue
-      : undefined;
 
-    // TODO:
-    // regexp for all cases may be too complicated and may lead to very long parsing
-    // const stringValue = (text as string).trim();
-    // // should be no spaces
-    // // should be not more then one plus or minus and it should be the first
-    // // remember sign
-    // // should be not more then one decimal point
-    // // split by decimal point
-    // // if less then one and more then to parts then invalid
-    // // if the first part exists then parseFloat and remember
-    // // if the second part exists then add decimal dot at the begonning, parseFloat and remember
-    // // add the remebered parts
+    // handle empty strings
+    const trimmed = value.trim();
+    if (!trimmed.length) {
+      return null;
+    }
+
+    // check for valid format and separate parts
+    const matches = trimmed.match(/^(\+|-)?(\d*)\.?(\d*)$/);
+    if (!matches) {
+      return undefined;
+    }
+
+    const sign = (matches[1] === '-') ? -1 : 1;
+    const integralPart = matches[2] ? parseFloat(matches[2]) : 0;
+    const fractionalPart = matches[3] ? parseFloat(`0.${matches[3]}`) : 0;
+
+    return sign * (integralPart + fractionalPart) || 0; // convert -0 to 0
   }
 }

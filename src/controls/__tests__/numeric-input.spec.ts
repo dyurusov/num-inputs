@@ -162,11 +162,10 @@ describe('NumericInput', () => {
       expect(input.text).toBe('');
       expect(input.isValid).toBe(true);
 
-      // TODO:
-      // input.value = '+03.12';
-      // expect(input.value).toBe(3.12);
-      // expect(input.text).toBe('3.12');
-      // expect(input.isValid).toBe(true);
+      input.value = '+03.12';
+      expect(input.value).toBe(3.12);
+      expect(input.text).toBe('3.12');
+      expect(input.isValid).toBe(true);
 
       input.value = '-3.12';
       expect(input.value).toBe(-3.12);
@@ -218,16 +217,15 @@ describe('NumericInput', () => {
       expect(input.text).toBe('-545.56.8');
       expect(input.isValid).toBe(false);
 
-      // TODO:
-      // input.text = '45.';
-      // expect(input.value).toBe(45);
-      // expect(input.text).toBe('45.');
-      // expect(input.isValid).toBe(true);
+      input.text = '45.';
+      expect(input.value).toBe(45);
+      expect(input.text).toBe('45.');
+      expect(input.isValid).toBe(true);
 
-      // input.text = '003';
-      // expect(input.value).toBe(3);
-      // expect(input.text).toBe('003');
-      // expect(input.isValid).toBe(true);
+      input.text = '003';
+      expect(input.value).toBe(3);
+      expect(input.text).toBe('003');
+      expect(input.isValid).toBe(true);
     });
   });
 
