@@ -1,5 +1,6 @@
 import { InputInterface } from './input-interface';
-import { ValueType, EventTypes, EventType, EventListeners, EventListener } from './types';
+import { ChangeTracker } from './change-tracker';
+import { ValueType, EventTypes, EventUnsubscriber } from './types';
 
 
 const widgetClassNames = {
@@ -8,17 +9,23 @@ const widgetClassNames = {
   isInvalid: 'is-invalid',
 }
 
+const trackedAttrs = [
+  'value',
+  'text',
+  'isValid',
+];
 
-export default class NumericInput implements InputInterface {
+
+export default class NumericInput extends ChangeTracker implements InputInterface {
   protected _hostElement?: HTMLElement;
   protected _value: ValueType = null;
   protected _text = '';
-  protected eventListeners: EventListeners = new Map();
   protected _isMounted = false;
   protected _widget?: HTMLElement;
-
+  protected isValidChangedUnsubscriber?: EventUnsubscriber;
 
   constructor(element: HTMLElement | string) {
+    super();
     const hostElement = element instanceof HTMLElement 
       ? element
       : document.getElementById(element);
@@ -52,7 +59,7 @@ export default class NumericInput implements InputInterface {
         this._value = parsedValue;
         this._text = this._value.toString();
       }
-    });
+    }, trackedAttrs);
   }
 
 
@@ -68,7 +75,7 @@ export default class NumericInput implements InputInterface {
         ((parsedValue === null) || (parsedValue === undefined) || (parsedValue.toString() === text)) 
           ? parsedValue
           : undefined;
-    });
+    }, trackedAttrs);
   }
 
 
@@ -99,49 +106,14 @@ export default class NumericInput implements InputInterface {
   }
 
 
-  protected trackChanges(setter: () => void): void {
-    const prevValues = {
-      value: this.value,
-      text: this.text,
-      isValid: this.isValid,
-    };
-    setter();
-    if (prevValues.value !== this.value) {
-      this.emit(EventTypes.valueChanged, this.value);
-    }
-    if (prevValues.text !== this.text) {
-      this.emit(EventTypes.textChanged, this.text);
-    }
-    if (prevValues.isValid !== this.isValid) {
-      this.emit(EventTypes.isValidChanged, this.isValid);
-    }
-  }
-
-  on(event: EventType, listener: EventListener): void {
-    const key = event;
-    const listeners = this.eventListeners.get(key) || [];
-    listeners.push(listener);
-    this.eventListeners.set(key, listeners);
-  }
-
-  off(event: EventType, listener: EventListener): void {
-    const listeners = (this.eventListeners.get(event) || []).filter(item => item != listener);
-    this.eventListeners.set(event, listeners);
-  }
-
-  protected emit(event: EventType, newValue: any): void {
-    (this.eventListeners.get(event) || []).forEach((listener: EventListener) => listener(newValue));
-  }
-
-
   destroy(): void {
     this.unmount();
   }
 
   protected unmount(): void {
     if (this.isMounted) {
-      this.eventListeners.clear();
-      this.off(EventTypes.isValidChanged, this.updateWidget);
+      this.clearListeners();
+      this.isValidChangedUnsubscriber && this.isValidChangedUnsubscriber();
       this._widget && this._widget.remove();
       this._widget = undefined;
       this._isMounted = false;
@@ -150,7 +122,8 @@ export default class NumericInput implements InputInterface {
 
   protected mount(): void {
     if (this.hostElement) {
-      this.eventListeners.clear();
+      this.clearListeners();
+
       const widget = document.createElement('div');
       widget.classList.add(widgetClassNames.widget);
       const input = document.createElement('input');
@@ -159,7 +132,7 @@ export default class NumericInput implements InputInterface {
       input.addEventListener('blur', () => widget.classList.remove(widgetClassNames.hasFocus));
       input.addEventListener('input', () => this.text = input.value);
       widget.append(input);
-      this.on(EventTypes.isValidChanged, this.updateWidget);
+      this.isValidChangedUnsubscriber = this.on(EventTypes.isValidChanged, this.updateWidget);
       this.on(EventTypes.textChanged, value => (input.value = value));
 
       this._widget = widget;
