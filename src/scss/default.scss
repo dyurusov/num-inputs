@@ -1,6 +1,7 @@
+$inputPadding: 0.25em;
+
 @mixin num-input-wiget {
   border: 1px solid #d3d3d3;
-  display: relative;
 
   &.has-focus {
     border-color: #90d0e6;
@@ -17,6 +18,7 @@
   input {
     border: none;
     width: 100%;
+    padding: $inputPadding 2*$inputPadding;
 
     &:focus {
       outline: none;
@@ -35,7 +37,7 @@
   position: relative;
 
   input {
-    padding-right: $spanWidth + 0.5em;
+    padding-right: $spanWidth + 0.5em + 2*$inputPadding;
   }
 
   span {
@@ -48,6 +50,6 @@
     text-align: center;
     overflow: hidden;
     font-size: 0.9em;
-    line-height: 1.25;
+    line-height: 1.5;
   }
 }

@@ -1,0 +1,23 @@
+.columns.custom {
+  @mixin num-input-wiget {
+    &.has-focus {
+      border-color: rgb(93, 194, 93);
+    }
+
+    input {
+      background-color: yellow;
+    }
+  }
+
+  .number-input-widget {
+    @include num-input-wiget;
+  }
+
+  .calc-input-widget {
+    @include num-input-wiget;
+    span {
+      border: 2px outset;
+      line-height: 1.25;
+    }
+  }
+}
