@@ -1,5 +1,6 @@
 import { InputInterface } from './input-interface';
-import { ChangeTracker } from './change-tracker';
+import { Control } from './control';
+import { NumericParser } from './parser/numeric';
 import { ValueType, EventUnsubscriber } from './types';
 
 
@@ -16,7 +17,7 @@ const trackedAttrs = [
 ];
 
 
-export default class NumericInput extends ChangeTracker implements InputInterface {
+export default class NumericInput extends Control implements InputInterface {
   protected _hostElement?: HTMLElement;
   protected _value: ValueType = null;
   protected _text = '';
@@ -25,7 +26,7 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
   protected unsubscribers: Array<EventUnsubscriber> = [];
 
   constructor(element: HTMLElement | string) {
-    super();
+    super(new NumericParser());
     const hostElement = element instanceof HTMLElement
       ? element
       : document.getElementById(element);
@@ -51,7 +52,7 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
 
   set value(value: ValueType) {
     this.trackChanges(() => {
-      const parsedValue = this.parseText(value);
+      const parsedValue = this.parser.parse(value);
       if ((parsedValue === undefined) || (parsedValue === null)) {
         this._value = null;
         this._text = '';
@@ -70,7 +71,7 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
   set text(text: string) {
     this.trackChanges(() => {
       this._text = text;
-      const parsedValue = this.parseText(text);
+      const parsedValue = this.parser.parse(text);
       this._value =
         ((parsedValue === null) || (parsedValue === undefined) || (parsedValue.toString() === text)) 
           ? parsedValue
@@ -81,28 +82,6 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
 
   get isValid(): boolean {
     return this._value !== undefined;
-  }
-
-
-  protected parseText(text: ValueType): number | undefined | null {
-    if ((text === '') || (text === null) || (text === undefined)) {
-      return null;
-    }
-    const parsedValue: number = parseFloat(text as string);
-    return isNaN(parsedValue) ? undefined : parsedValue;
-
-    // TODO:
-    // regexp for all cases may be too complicated and may lead to very long parsing
-    // const stringValue = (text as string).trim();
-    // // should be no spaces
-    // // should be not more then one plus or minus and it should be the first
-    // // remember sign
-    // // should be not more then one decimal point
-    // // split by decimal point
-    // // if less then one and more then to parts then invalid
-    // // if the first part exists then parseFloat and remember
-    // // if the second part exists then add decimal dot at the begonning, parseFloat and remember
-    // // add the remebered parts
   }
 
 
