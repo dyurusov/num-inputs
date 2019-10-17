@@ -1,4 +1,4 @@
-import { DomBuilderInterface, Options, CssClassNames, OwnerGetter } from './types';
+import { DomBuilderInterface, Options, CssClassNames } from './types';
 import { EventUnsubscriber, InputInterface } from '../types';
 
 const defaultClassNames: CssClassNames = {
@@ -13,14 +13,20 @@ export class NumericDomBuilder implements DomBuilderInterface {
   protected wrapper?: HTMLElement;
   protected unsubscribers: Array<EventUnsubscriber> = [];
   protected classNames: CssClassNames;
-  protected getOwner: OwnerGetter;
+  protected owner?: InputInterface;
 
-  constructor(ownerGetter: OwnerGetter, options: Options = {}) {
+  constructor(options: Options = {}) {
     this.classNames = Object.assign(defaultClassNames, options.classNames || {});
-    this.getOwner = ownerGetter;
+  }
+
+  bindOwner(owner: InputInterface): void {
+    this.owner = owner;
   }
 
   mount(hostElement: HTMLElement): void {
+    if (!this.owner) {
+      throw new Error('Owner is not bound');
+    }
     if (!this.isMounted) {
       this.wrapper = document.createElement('div');
       this.wrapper.classList.add(this.classNames.wrapper);
@@ -41,14 +47,14 @@ export class NumericDomBuilder implements DomBuilderInterface {
     // listen for input field events
     input.addEventListener('focus', () => this.wrapper && this.wrapper.classList.add(this.classNames.hasFocus));
     input.addEventListener('blur', () => this.wrapper && this.wrapper.classList.remove(this.classNames.hasFocus));
-    input.addEventListener('input', () => this.owner.text = input.value);
+    input.addEventListener('input', () => this.owner && (this.owner.text = input.value));
 
     // listen for owner evnts (and remeber unlisten methods for unmounting)
     const isValidListener = (isValid: boolean): void =>
       this.wrapper && this.wrapper.classList[isValid ? 'remove' : 'add'](this.classNames.isInvalid);
-    this.unsubscribers.push(this.owner.on('isValidChanged', isValidListener));
+    this.owner && this.unsubscribers.push(this.owner.on('isValidChanged', isValidListener));
     const textListener = (text: string): void => { input.value = text };
-    this.unsubscribers.push(this.owner.on('textChanged', textListener));
+    this.owner && this.unsubscribers.push(this.owner.on('textChanged', textListener));
 
     return input;
   }
@@ -64,9 +70,5 @@ export class NumericDomBuilder implements DomBuilderInterface {
 
   get isMounted(): boolean {
     return this._isMounted;
-  }
-
-  protected get owner(): InputInterface {
-    return this.getOwner();
   }
 }
