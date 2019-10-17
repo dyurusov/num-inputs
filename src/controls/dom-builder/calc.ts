@@ -16,7 +16,7 @@ export class CalcDomBuilder extends NumericDomBuilder {
     return [ this.buildInput(), this.buildDisplay() ];
   }
 
-  protected buildDisplay() {
+  protected buildDisplay(): void {
     const display = document.createElement('span');
 
     // listen for owner events and remeber unlisten methods for unmounting
