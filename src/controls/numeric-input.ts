@@ -1,6 +1,6 @@
 import { InputInterface } from './input-interface';
 import { ChangeTracker } from './change-tracker';
-import { ValueType, EventTypes, EventUnsubscriber } from './types';
+import { ValueType, EventUnsubscriber } from './types';
 
 
 const widgetClassNames = {
@@ -22,11 +22,11 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
   protected _text = '';
   protected _isMounted = false;
   protected _widget?: HTMLElement;
-  protected isValidChangedUnsubscriber?: EventUnsubscriber;
+  protected unsubscribers: Array<EventUnsubscriber> = [];
 
   constructor(element: HTMLElement | string) {
     super();
-    const hostElement = element instanceof HTMLElement 
+    const hostElement = element instanceof HTMLElement
       ? element
       : document.getElementById(element);
     if (hostElement) {
@@ -113,7 +113,7 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
   protected unmount(): void {
     if (this.isMounted) {
       this.clearListeners();
-      this.isValidChangedUnsubscriber && this.isValidChangedUnsubscriber();
+      this.unsubscribers.forEach(unsubscriber => unsubscriber());
       this._widget && this._widget.remove();
       this._widget = undefined;
       this._isMounted = false;
@@ -132,20 +132,18 @@ export default class NumericInput extends ChangeTracker implements InputInterfac
       input.addEventListener('blur', () => widget.classList.remove(widgetClassNames.hasFocus));
       input.addEventListener('input', () => this.text = input.value);
       widget.append(input);
-      this.isValidChangedUnsubscriber = this.on(EventTypes.isValidChanged, this.updateWidget);
-      this.on(EventTypes.textChanged, value => (input.value = value));
+      this.unsubscribers.push(this.on('isValidChanged', isValid => {
+        if (isValid) {
+          this._widget && this._widget.classList.remove(widgetClassNames.isInvalid);
+        } else {
+          this._widget && this._widget.classList.add(widgetClassNames.isInvalid);
+        }
+      }));
+      this.unsubscribers.push(this.on('textChanged', text => (input.value = text)));
 
       this._widget = widget;
       this._hostElement && this._hostElement.append(this._widget);
       this._isMounted = true;
-    }
-  }
-
-  updateWidget = (isValid: boolean): void => {
-    if (isValid) {
-      this._widget && this._widget.classList.remove(widgetClassNames.isInvalid);
-    } else {
-      this._widget && this._widget.classList.add(widgetClassNames.isInvalid);
     }
   }
 }

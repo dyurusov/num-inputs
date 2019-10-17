@@ -1,4 +1,4 @@
-import { ValueType, EventType, EventListener } from './types';
+import { ValueType, Event, EventListener } from './types';
 
 export interface InputInterface {
   readonly value: ValueType;
@@ -6,5 +6,5 @@ export interface InputInterface {
   isValid: boolean;
   readonly hostElement?: HTMLElement;
 
-  on(event: EventType | string, handler: EventListener): void;
+  on(event: Event, handler: EventListener): void;
 }
