@@ -42,6 +42,8 @@ describe('numeric-parser', () => {
     expect(parse('+0.1')).toBe(0.1);
     expect(parse('-0.1')).toBe(-0.1);
     expect(parse('-00010.09100')).toBe(-10.091);
+    expect(parse('- 1')).toBe(-1);
+    expect(parse('+  \n 1')).toBe(1);
   })
 
   it('should not parse non-numeric like strings as undefined', () => {
