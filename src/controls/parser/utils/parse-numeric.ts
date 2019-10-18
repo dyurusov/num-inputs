@@ -6,7 +6,7 @@ import { ValueType, ParsedType } from '../types';
  *  - {null} for empty parsed value
  *  - {undefined} for incorect value
  */
-export default function parseNumeric(value: ValueType): ParsedType {
+export default function (value: ValueType): ParsedType {
   // handle numbers and NaN
   if (typeof value === 'number') {
     return isNaN(value)
