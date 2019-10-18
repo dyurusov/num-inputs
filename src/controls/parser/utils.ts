@@ -120,10 +120,11 @@ export default class ParserUtils {
     }
 
     let curPosition = 0;
+    let newCondenced = condenced;
     do {
-      const opnPosition = condenced.indexOf('(', curPosition);
+      const opnPosition = newCondenced.indexOf('(', curPosition);
       const opnIsFound = (opnPosition !== -1);
-      const firstClsPosition = condenced.indexOf(')', curPosition);
+      const firstClsPosition = newCondenced.indexOf(')', curPosition);
       const firstClsIsFound = (firstClsPosition !== -1);
       if (opnIsFound) {
         if (!firstClsIsFound) {
@@ -132,8 +133,8 @@ export default class ParserUtils {
         if (opnPosition > firstClsPosition) {
           throw new Error('Closing bracket befor opening one');
         }
-        const clsPosition = ParserUtils.findClosingBracket(condenced, opnPosition);
-        const bracketsContent = condenced.substring(opnPosition + 1, clsPosition);
+        const clsPosition = ParserUtils.findClosingBracket(newCondenced, opnPosition);
+        const bracketsContent = newCondenced.substring(opnPosition + 1, clsPosition);
         const numericBracketsContent = ParserUtils.parseNumeric(bracketsContent);
         if (numericBracketsContent === null) {
           throw new Error('Empty numeric');
@@ -143,23 +144,23 @@ export default class ParserUtils {
           const parsedBracketsContent = ParserUtils.parseExpressionBrackets(bracketsContent);
           newBracketsContent = (parsedBracketsContent < 0)
             ? `(${parsedBracketsContent})`
-            : (parsedBracketsContent as unknown as string);
+            : parsedBracketsContent.toString();
         } else {
           newBracketsContent = (numericBracketsContent < 0)
             ? `(${numericBracketsContent})`
-            : (numericBracketsContent as unknown as string);
+            : numericBracketsContent.toString();
         }
-        condenced.replace(`(${bracketsContent})`, newBracketsContent);
-        curPosition = opnPosition + 1;
+        newCondenced = newCondenced.substring(0, opnPosition)
+        + newBracketsContent + newCondenced.substr(clsPosition + 1);
+        curPosition = opnPosition + newBracketsContent.length + 1;
       } else {
         if (firstClsIsFound) {
           throw new Error('Closing bracket without opening one');
         }
         break;
       }
-    } while (curPosition < condenced.length); // loop is never broken by this condition
-
-    return ParserUtils.parseExpressionMultiplicationGroups(condenced);
+    } while (curPosition < newCondenced.length); // loop is never broken by this condition
+    return ParserUtils.parseExpressionMultiplicationGroups(newCondenced);
   }
 
 
@@ -198,7 +199,52 @@ export default class ParserUtils {
    * @throws on unparsable condensed
    */
   static parseExpressionMultiplicationGroups(condenced: string): number {
-    return Infinity;
+    const initialParsed = ParserUtils.parseNumeric(condenced);
+    if (initialParsed === null) {
+      throw new Error('Empty numeric');
+    } else if (initialParsed !== undefined) {
+      return (initialParsed as number);
+    }
+
+    const firstCar = condenced[0];
+    const initialSign = ((firstCar === '+') || (firstCar === '-'))
+      ? ((firstCar === '+') ? 1 : -1)
+      : 0;
+    let startPosition = initialSign ? 1 : 0;
+    let endPosition = startPosition;
+    let newCondenced = condenced
+    do {
+      const char = newCondenced[endPosition];
+      if (char === '(') {
+        endPosition = ParserUtils.findClosingBracket(newCondenced, endPosition);
+      }
+      if ((endPosition + 1) < newCondenced.length) {
+        const nextChar = newCondenced[endPosition + 1];
+        if ((nextChar === '+') || (nextChar === '-')) {
+          const numeric = newCondenced.substring(startPosition, endPosition + 1);
+          const parsed = ParserUtils.parseExpressionMultiply(numeric);
+          const parsedSubstitution = (parsed < 0)
+            ? `(${parsed})`
+            : parsed.toString();
+          newCondenced = newCondenced.substring(0, startPosition)
+            + parsedSubstitution + newCondenced.substr(endPosition + 1);
+          startPosition = startPosition + (parsedSubstitution as string).length + 1;
+          endPosition = startPosition;
+        } else {
+          endPosition++;
+        }
+      } else {
+        const numeric = newCondenced.substring(startPosition, newCondenced.length);
+        const parsed = ParserUtils.parseExpressionMultiply(numeric);
+        const parsedSubstitution = (parsed < 0)
+          ? `(${parsed})`
+          : parsed.toString();
+        newCondenced = newCondenced.substring(0, startPosition)
+          + parsedSubstitution; // + newCondenced.substr(endPosition + 1);
+        break;
+      }
+    } while (startPosition < newCondenced.length); // never
+    return ParserUtils.parseExpressionAdding(newCondenced);
   }
 
 
@@ -209,6 +255,13 @@ export default class ParserUtils {
    * @throws on unparsable condensed
    */
   static parseExpressionMultiply(condenced: string): number {
+    const initialParsed = ParserUtils.parseNumeric(condenced);
+    if (initialParsed === null) {
+      throw new Error('Empty numeric');
+    } else if (initialParsed !== undefined) {
+      return (initialParsed as number);
+    }
+
     let result = 1;
     let action = 0;
     let startPosition = 0;
@@ -271,6 +324,13 @@ export default class ParserUtils {
    * @throws on unparsable condensed
    */
   static parseExpressionAdding(condenced: string): number {
+    const initialParsed = ParserUtils.parseNumeric(condenced);
+    if (initialParsed === null) {
+      throw new Error('Empty numeric');
+    } else if (initialParsed !== undefined) {
+      return (initialParsed as number);
+    }
+
     let result = 0;
     let action = 0;
     const firstCar = condenced[0];
