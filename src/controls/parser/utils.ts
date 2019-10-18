@@ -130,13 +130,18 @@ export default class ParserUtils {
         if (numericBracketsContent === null) {
           throw new Error('Empty numeric');
         }
+        let newBracketsContent = '';
         if (numericBracketsContent === undefined) {
           const parsedBracketsContent = ParserUtils.parseExpressionBrackets(bracketsContent);
-          const newBracketsContent = (parsedBracketsContent < 0)
+          newBracketsContent = (parsedBracketsContent < 0)
             ? `(${parsedBracketsContent})`
             : (parsedBracketsContent as unknown as string);
-          condenced.replace(`(${bracketsContent})`, newBracketsContent);
+        } else {
+          newBracketsContent = (numericBracketsContent < 0)
+            ? `(${numericBracketsContent})`
+            : (numericBracketsContent as unknown as string);
         }
+        condenced.replace(`(${bracketsContent})`, newBracketsContent);
         curPosition = opnPosition + 1;
       } else {
         if (firstClsIsFound) {
