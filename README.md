@@ -1,5 +1,8 @@
 # NumInputs
+
 Ready to use demo page is located in dist folder (dist/index.html).
+
+Resulting numeric values and expression results is potentially subjected to rounding errors and precision loss due to js internals.
 
 Available project-related tasks:
 * npm run build - build project for production in dist folder
