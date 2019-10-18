@@ -145,6 +145,16 @@ describe('utils', () => {
       expect(() => parse('( (')).toThrow();
     });
 
+    it('should throw on opening brackets without action before', () => {
+      expect(() => parse('22 (4)')).toThrow();
+      expect(() => parse('3.(3)')).toThrow();
+    });
+
+    it('should throw on closing brackets without action after', () => {
+      expect(() => parse('(4)33')).toThrow();
+      expect(() => parse('(3) .4')).toThrow();
+    });
+
     it('should perform appropriate conversions', () => {
       expect(parse('- .123 + 45')).toBe('-.123+45');
       expect(parse('((-123 ) -( + 45))')).toBe('((-123)-(+45))');
@@ -186,6 +196,24 @@ describe('utils', () => {
       expect(find('d(sf)4', 1)).toBe(4);
       expect(find('d (s()(()))f)4', 2)).toBe(10);
       expect(find('d(s()(( ) ))f)4', 5)).toBe(10);
+    });
+  });
+
+  describe('parseExpressionMultiply', () => {
+    const parse = Utils.parseExpressionMultiply;
+
+    it('should multiply ans divide', () => {
+      expect(parse('1*1')).toBe(1);
+      expect(parse('2/2')).toBe(1);
+      expect(parse('3*2*1')).toBe(6);
+      expect(parse('3*2/1')).toBe(6);
+      expect(parse('11*42/11')).toBe(42);
+      expect(parse('11/11/1')).toBe(1);
+      expect(parse('3*(-2)/1')).toBe(-6);
+      expect(parse('3*2/(-1)*1')).toBe(-6);
+      expect(parse('3*2/(-1)*(-1)')).toBe(6);
+      expect(parse('3*2/(-1)')).toBe(-6);
+      expect(parse('(-3)*2/(-1)')).toBe(6);
     });
   });
 });

@@ -92,6 +92,14 @@ export default class ParserUtils {
       throw new Error('Invalid number of openning and closing brackets');
     }
 
+    if (condenced.match(/[\d.]\(/)) {
+      throw new Error('No action before non-first opening bracket');
+    }
+
+    if (condenced.match(/\)[\d.]/)) {
+      throw new Error('No action after non-last closing bracket');
+    }
+
     return condenced;
   }
 
@@ -151,7 +159,7 @@ export default class ParserUtils {
       }
     } while (curPosition < condenced.length); // loop is never broken by this condition
 
-    return ParserUtils.parseExpressionMultiplication(condenced);
+    return ParserUtils.parseExpressionMultiplicationGroups(condenced);
   }
 
 
@@ -184,12 +192,76 @@ export default class ParserUtils {
 
 
   /**
-   * Handles multiplication groups
+   * Handle multiplication groups
    * @params condenced string containing *, /, -, +, . and digits only
    * @returns parsed result
    * @throws on unparsable condensed
    */
-  static parseExpressionMultiplication(condenced: string): number {
+  static parseExpressionMultiplicationGroups(condenced: string): number {
     return Infinity;
+  }
+
+
+  /**
+   * Perform multiplicatipn adn division
+   * @params condenced string containing *, / and digits (negative in brackets) only
+   * @returns parsed result
+   * @throws on unparsable condensed
+   */
+  static parseExpressionMultiply(condenced: string): number {
+    let result = 1;
+    let action = 0;
+    let startPosition = 0;
+    let endPosition = startPosition;
+    const length = condenced.length;
+    do {
+      const char = condenced[endPosition];
+      let withBrackets = false;
+      if (char === '(') {
+        endPosition = ParserUtils.findClosingBracket(condenced, endPosition);
+        withBrackets = true;
+      }
+      if ((endPosition + 1) < length) {
+        const nextChar = condenced[endPosition + 1];
+        if ((nextChar === '*') || (nextChar === '/')) {
+          const numeric = condenced.substring(
+            withBrackets ? (startPosition + 1) : startPosition,
+            withBrackets ? endPosition : (endPosition + 1),
+          );
+          const parsed = ParserUtils.parseNumeric(numeric);
+          if ((parsed === null) && (parsed === undefined)) {
+            throw new Error(`Invalid numeric: "${numeric}"`);
+          }
+          if (action) {
+            result = (action < 0) ? (result / (parsed as number)) : (result * (parsed as number))
+          } else {
+            result = parsed as number;
+          }
+          action = (nextChar === '*') ? 1 : -1;
+          startPosition = endPosition + 2;
+          endPosition = startPosition;
+        } else {
+          endPosition++;
+        }
+      } else {
+        const numeric = condenced.substring(
+          withBrackets ? (startPosition + 1) : startPosition,
+          withBrackets ? endPosition : (endPosition + 1),
+        );
+        const parsed = ParserUtils.parseNumeric(numeric);
+        if ((parsed === null) && (parsed === undefined)) {
+          throw new Error(`Invalid numeric: "${numeric}"`);
+        }
+        if (action) {
+          result = (action < 0) ? (result / (parsed as number)) : (result * (parsed as number))
+        } else {
+          result = parsed as number;
+        }
+        break;
+      }
+    } while (startPosition < length); // never
+    return result;
+
+    // return NaN;
   }
 }
