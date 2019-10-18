@@ -23,7 +23,7 @@ export class Control extends ChangeTracker implements InputInterface {
 
 
   mount(): void {
-    if (this.hostElement && !this.domBuilder.isMounted) {
+    if (this.hostElement && (!this.hostElement.innerHTML.trim()) && !this.domBuilder.isMounted) {
       this.domBuilder.mount(this.hostElement);
     }
   }
