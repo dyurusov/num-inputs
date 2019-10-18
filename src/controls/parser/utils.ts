@@ -54,7 +54,7 @@ export default class ParserUtils {
     }
 
     try {
-      const condenced = ParserUtils.parseExpressionSimpleChecks((value as string).trim());
+      const condenced = ParserUtils.parseExpressionCondence((value as string).trim());
       return ParserUtils.parseExpressionBrackets(condenced);
     } catch (e) {
       return undefined;
@@ -64,12 +64,11 @@ export default class ParserUtils {
 
   /**
    * Peforms simple checks to simplify further parsing
-   * @params
-   *  trimmed string
-   * @returns
-   *  condenced (withowt spaces) string or undefined
+   * @params trimmed string
+   * @returns condenced (withowt spaces) string or undefined
+   * @throws on unparsable condensed
    */
-  static parseExpressionSimpleChecks(trimmed: string): string {
+  static parseExpressionCondence(trimmed: string): string {
     if (trimmed.match(/[^\d .+\-/*()]/)) {
       throw new Error('Invalid char');
     }
@@ -97,44 +96,95 @@ export default class ParserUtils {
   }
 
 
-  static parseExpressionBrackets(condenced: string): ParsedType {
-    /**
-     * @TODO
-     *  replace after implementation
-     * */
-    return Infinity; // undefined;
+  /**
+   * Handles brackets groups
+   * @params condenced string containing (, ), *, /, -, +, . and digits onlu
+   * @returns parsed result
+   * @throws on unparsable condensed
+   */
+  static parseExpressionBrackets(condenced: string): number {
+    if (condenced.match(/^[*/]/)) {
+      throw new Error('Multiplication or division on the first position');
+    }
 
-    /*
-    1. если начальная позиция содержит * или ., то throw
-    2. если конечная позиция содержит *, /, + или -, то throw
-    3. находим позицию первой открывающейся скобки
-    4. найдена?
-      + да
-        4.1. находим позицию первой закрывающейся скобки
-        4.2. нашили?
-          + да
-            4.2.1. найденая позиция закрывающейся скобки раньше открывающейся?
-              + да
-                4.2.1.1. throw
-              - нет
-                4.2.1.2. нахоим позицию закрывающейся скобки, соответсвующей найденой открывающейся
-                4.2.1.3. найдена?
-                  + да
-                    4.2.1.3.1. пытаемся интерпретировать его как число
-                    4.2.1.3.2. получилось?
-                      +да
-                        4.2.1.3.2.1. находим следующую позицию первой открывающейся скобки по шагу 3 за ранее найденной позицией на этом шаге
-                      - нет
-                        4.2.1.3.2.2. обрабатываем строку внутри скобок, начиная с шага 1 (при ошибке парсиннга будет throw)
-                        4.2.1.3.2.3. получаем строку из полученного результата, если он отрицательный, то оборачиваем его скобками
-                        4.2.1.3.2.4. заменяем ранее найденную подстроку со скобками (шаги 4.1 и 4.2.1.2) на новую
-                        4.2.1.3.2.5. находим следующую позицию первой открывающейся скобки по шагу 3 за ранее найденной позицией на этом шаге
-                  - нет
-                    4.2.1.3.3. throw
-          - нет
-            4.2.2. throw
-      -нет
-        4.3. обрабатываем группу, не содержащую скобок (кроме скобок для отрицательных чисел) отельной процедурой
-    */
+    if (condenced.match(/[*/+-]$/)) {
+      throw new Error('Multiplication, division, adding or substraction on the first position');
+    }
+
+    let curPosition = 0;
+    do {
+      const opnPosition = condenced.indexOf('(', curPosition);
+      const opnIsFound = (opnPosition !== -1);
+      const firstClsPosition = condenced.indexOf(')', curPosition);
+      const firstClsIsFound = (firstClsPosition !== -1);
+      if (opnIsFound) {
+        if (!firstClsIsFound) {
+          throw new Error('No closing bracket');
+        }
+        if (opnPosition > firstClsPosition) {
+          throw new Error('Closing bracket befor opening one');
+        }
+        const clsPosition = ParserUtils.findClosingBracket(condenced, opnPosition);
+        const bracketsContent = condenced.substring(opnPosition + 1, clsPosition);
+        const numericBracketsContent = ParserUtils.parseNumeric(bracketsContent);
+        if (numericBracketsContent === null) {
+          throw new Error('Empty numeric');
+        }
+        if (numericBracketsContent === undefined) {
+          const parsedBracketsContent = ParserUtils.parseExpressionBrackets(bracketsContent);
+          const newBracketsContent = (parsedBracketsContent < 0)
+            ? `(${parsedBracketsContent})`
+            : (parsedBracketsContent as unknown as string);
+          condenced.replace(`(${bracketsContent})`, newBracketsContent);
+        }
+        curPosition = opnPosition + 1;
+      } else {
+        if (firstClsIsFound) {
+          throw new Error('Closing bracket without opening one');
+        }
+        break;
+      }
+    } while (curPosition < condenced.length); // loop is never broken by this condition
+
+    return ParserUtils.parseExpressionMultiplication(condenced);
+  }
+
+
+  /**
+   * Findes closing bracket for opening one at the start position
+   * @params expression to search and position of opening bracket
+   * @returns corresponging closing bracket
+   * @throws if not found or now opening bracket on start position
+   */
+  static findClosingBracket(expression: string, start: number): number {
+    if (expression[start] !== '(') {
+      throw new Error('No opening bracket at start position');
+    }
+
+    let level = 0;
+    for (let pos = start + 1; pos < expression.length; pos++) {
+      const char = expression[pos];
+      if (char === ')') {
+        if (!level) {
+          return pos;
+        }
+        level--;
+      } else if (char === '(') {
+        level++;
+      }
+    }
+
+    throw new Error('Closing bracket is not found');
+  }
+
+
+  /**
+   * Handles multiplication groups
+   * @params condenced string containing *, /, -, +, . and digits only
+   * @returns parsed result
+   * @throws on unparsable condensed
+   */
+  static parseExpressionMultiplication(condenced: string): number {
+    return Infinity;
   }
 }

@@ -80,8 +80,8 @@ describe('utils', () => {
   });
 
 
-  describe('parseExpressionSimpleChecks', () => {
-    const parse = Utils.parseExpressionSimpleChecks;
+  describe('parseExpressionCondence', () => {
+    const parse = Utils.parseExpressionCondence;
 
     it('should throw on invalid chars', () => {
       expect(() => parse('w')).toThrow();
@@ -148,6 +148,44 @@ describe('utils', () => {
     it('should perform appropriate conversions', () => {
       expect(parse('- .123 + 45')).toBe('-.123+45');
       expect(parse('((-123 ) -( + 45))')).toBe('((-123)-(+45))');
+    });
+  });
+
+
+  describe('parseExpressionBrackets', () => {
+    const parse = Utils.parseExpressionBrackets;
+
+    it('should throw on * or / in the first position', () => {
+      expect(() => parse('*123')).toThrow();
+      expect(() => parse('/123')).toThrow();
+    });
+
+    it('should throw on +, -, * or / in the last position', () => {
+      expect(() => parse('123+')).toThrow();
+      expect(() => parse('123.-')).toThrow();
+      expect(() => parse('123./')).toThrow();
+      expect(() => parse('123.*')).toThrow();
+    });
+  });
+
+
+  describe('findClosingBracket', () => {
+    const find = Utils.findClosingBracket;
+
+    it('should throw on start position without openning bracket', () => {
+      expect(() => find('dsf', 1)).toThrow();
+    });
+
+    it('should throw on non-found closing bracket', () => {
+      expect(() => find('d(sf', 1)).toThrow();
+      expect(() => find('d( 44(sf)', 1)).toThrow();
+    });
+
+    it('should find corresponding closing bracket', () => {
+      expect(find('d()4', 1)).toBe(2);
+      expect(find('d(sf)4', 1)).toBe(4);
+      expect(find('d (s()(()))f)4', 2)).toBe(10);
+      expect(find('d(s()(( ) ))f)4', 5)).toBe(10);
     });
   });
 });
