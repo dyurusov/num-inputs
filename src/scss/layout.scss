@@ -11,6 +11,19 @@ $wrapperWidth: 640px;
   appearance: none; // disable verious apearane in verious browser engins
 }
 
+button {
+  width: 6em;
+  margin-right: 0.1em;
+  padding: 0.25em 0.5em;
+  border: 1px solid lightgrey;
+}
+
+input {
+  width: 13em;
+  border: 1px solid lightgrey;
+  padding: 0.25em 0.5em;
+}
+
 
 /*
  * Layout
@@ -77,18 +90,5 @@ $wrapperWidth: 640px;
 
   .setter {
     margin: $verticalSpacing 0;
-
-    button {
-      width: 6em;
-      margin-right: 0.1em;
-      padding: 0.25em 0.5em;
-      border: 1px solid lightgrey;
-    }
-
-    input {
-      width: 13em;
-      border: 1px solid lightgrey;
-      padding: 0.25em 0.5em;
-    }
   }
 }
