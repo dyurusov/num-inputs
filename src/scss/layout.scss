@@ -12,7 +12,6 @@ $wrapperWidth: 640px;
 }
 
 button {
-  width: 6em;
   margin-right: 0.1em;
   padding: 0.25em 0.5em;
   border: 1px solid lightgrey;
@@ -90,5 +89,9 @@ input {
 
   .setter {
     margin: $verticalSpacing 0;
+
+    button {
+      width: 6em;
+    }
   }
 }
