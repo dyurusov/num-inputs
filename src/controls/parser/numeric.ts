@@ -22,7 +22,7 @@ export class NumericParser implements ParserInterface {
 
     // check for valid format and separate parts
     const matches = trimmed.match(/^(\+|-)?(\d*)\.?(\d*)$/);
-    if (!matches) {
+    if (!matches || (!matches[2] && !matches[3])) {
       return undefined;
     }
 
