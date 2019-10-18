@@ -19,6 +19,11 @@ export class CalcDomBuilder extends NumericDomBuilder {
   protected buildDisplay(): HTMLElement {
     const display = document.createElement('span');
 
+    // listen for input field events
+    display.tabIndex = -1; // force focus related events for display
+    display.addEventListener('focusin', () => this.wrapper && this.wrapper.classList.add(this.classNames.hasFocus));
+    display.addEventListener('focusout', () => this.wrapper && this.wrapper.classList.remove(this.classNames.hasFocus));
+
     // listen for owner events and remeber unlisten methods for unmounting
     const valueListener = (value: ValueType): void => {
       display.innerHTML = (value !== null)

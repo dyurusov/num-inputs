@@ -5,10 +5,6 @@ $inputPadding: 0.25em;
   width: 100%;
   height: 100%;
 
-  &:focus {
-    outline: none;
-  }
-
   &.has-focus {
     border-color: #90d0e6;
   }
@@ -58,5 +54,9 @@ $inputPadding: 0.25em;
     overflow: hidden;
     font-size: 0.9em;
     line-height: 1.5;
+
+    &:focus {
+      outline: none;
+    }
   }
 }

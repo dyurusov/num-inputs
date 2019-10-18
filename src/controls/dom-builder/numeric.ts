@@ -37,11 +37,6 @@ export class NumericDomBuilder implements DomBuilderInterface {
       this.wrapper = document.createElement('div');
       this.wrapper.classList.add(this.classNames.wrapper);
 
-      // listen for input field events
-      this.wrapper.tabIndex = -1; // forse focus related events for wrapper
-      this.wrapper.addEventListener('focusin', () => this.wrapper && this.wrapper.classList.add(this.classNames.hasFocus));
-      this.wrapper.addEventListener('focusout', () => this.wrapper && this.wrapper.classList.remove(this.classNames.hasFocus));
-
       this.buildElements().forEach(element => this.wrapper && this.wrapper.append(element));
       hostElement.append(this.wrapper);
       this._isMounted = true;
@@ -68,6 +63,8 @@ export class NumericDomBuilder implements DomBuilderInterface {
 
     // listen for input field events
     input.addEventListener('input', () => this.owner && (this.owner.text = input.value));
+    input.addEventListener('focus', () => this.wrapper && this.wrapper.classList.add(this.classNames.hasFocus));
+    input.addEventListener('blur', () => this.wrapper && this.wrapper.classList.remove(this.classNames.hasFocus));
 
     // listen for owner events and remeber unlisten methods for unmounting
     const isValidListener = (isValid: boolean): void =>
