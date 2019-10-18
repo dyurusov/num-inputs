@@ -3,6 +3,10 @@ $inputPadding: 0.25em;
 @mixin num-input-wiget {
   border: 1px solid #d3d3d3;
 
+  &:focus {
+    outline: none;
+  }
+
   &.has-focus {
     border-color: #90d0e6;
   }

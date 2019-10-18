@@ -1,7 +1,9 @@
 .columns.custom {
   @mixin num-input-wiget {
-    &.has-focus {
-      border-color: rgb(93, 194, 93);
+    border-color: #5ec25e !important;
+
+    &.is-invalid {
+      border-color: #db2f2f !important;
     }
 
     input {
