@@ -1,6 +1,6 @@
 import { ParserInterface } from './types';
-import parseNumeric from './utils/parse-numeric';
+import Utils from './utils';
 
 export class NumericParser implements ParserInterface {
-  constructor(public readonly parse = parseNumeric) {}
+  constructor(public readonly parse = Utils.parseNumeric) {}
 }

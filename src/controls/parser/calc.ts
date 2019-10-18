@@ -1,6 +1,6 @@
 import { ParserInterface } from './types';
-import parseExpression from './utils/parse-expression';
+import Utils from './utils';
 
 export class CalcParser implements ParserInterface {
-  constructor(public readonly parse = parseExpression) {}
+  constructor(public readonly parse = Utils.parseExpression) {}
 }
