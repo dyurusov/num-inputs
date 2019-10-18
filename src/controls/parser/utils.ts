@@ -48,7 +48,77 @@ export default class ParserUtils {
    *  - {undefined} for incorect value
    */
   static parseExpression(value: ValueType): ParsedType {
-    // TODO: implement
-    return ParserUtils.parseNumeric(value);
+    const asNumeric = ParserUtils.parseNumeric(value);
+    if (asNumeric !== undefined) {
+      return asNumeric;
+    }
+
+    try {
+      const condenced = ParserUtils.parseExpressionSimpleChecks((value as string).trim());
+      return ParserUtils.parseExpressionBrackets(condenced);
+    } catch (e) {
+      return undefined;
+    }
+  }
+
+
+  /**
+   * Peforms simple checks to simplify further parsing
+   * @params
+   *  trimmed string
+   * @returns
+   *  condenced (withowt spaces) string or undefined
+   */
+  static parseExpressionSimpleChecks(trimmed: string): string {
+    // check for invalid chars
+    if (trimmed.match(/[^\d .+\-/*()]/)) {
+      throw new Error();
+    }
+
+    // check for spaces within numbers
+    if (trimmed.match(/[\d.]\s+[\d.]/)) {
+      throw new Error();
+    }
+
+    // it is safe to remove spaces now
+    const condenced = trimmed.replace(/\s/g, '');
+
+    // check for doubled actions
+    if (condenced.match(/[-+/*][-+/*]/)) {
+      throw new Error();
+    }
+
+    // check for emty brackets
+    if (condenced.match(/\(\)/)) {
+      throw new Error();
+    }
+
+    // check for invalid number of openning and closing brackets
+    if ((condenced.match(/\(/g) || []).length !== (condenced.match(/\)/g) || []).length) {
+      throw new Error();
+    }
+
+    return condenced;
+  }
+
+
+  static parseExpressionBrackets(condenced: string): ParsedType {
+    /**
+     * @TODO
+     *  replace after implementation
+     * */
+    return Infinity; // undefined;
+
+    /*
+    содержит скобки?
+      + да
+        закрывающая скобка раньше отрывающаей?
+          + да
+            throw
+          - нет
+            ...
+      - нет
+        обрабатываем группировку
+    */
   }
 }
