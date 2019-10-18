@@ -8,6 +8,7 @@ $wrapperWidth: 640px;
 
 * {
   box-sizing: border-box;
+  appearance: none; // disable verious apearane in verious browser engins
 }
 
 
@@ -79,10 +80,15 @@ $wrapperWidth: 640px;
 
     button {
       width: 6em;
+      margin-right: 0.1em;
+      padding: 0.25em 0.5em;
+      border: 1px solid lightgrey;
     }
 
     input {
       width: 13em;
+      border: 1px solid lightgrey;
+      padding: 0.25em 0.5em;
     }
   }
 }

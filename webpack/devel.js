@@ -38,6 +38,7 @@ module.exports = merge(common, {
         use: [
           'style-loader',
           'css-loader?sourceMap=true',
+          'postcss-loader',
           'sass-loader',
         ],
       }
