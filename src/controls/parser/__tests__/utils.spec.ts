@@ -116,24 +116,38 @@ describe('utils', () => {
     })
 
     it('should throw on doubled actions', () => {
-      expect(() => parse('++')).toThrow();
-      expect(() => parse('-+')).toThrow();
-      expect(() => parse('/+')).toThrow();
+      expect(() => parse('+ +')).toThrow();
+      expect(() => parse('-  +')).toThrow();
+      expect(() => parse('/ +')).toThrow();
       expect(() => parse('*+')).toThrow();
-      expect(() => parse('-*')).toThrow();
-      expect(() => parse('-/')).toThrow();
+      expect(() => parse('-  *')).toThrow();
+      expect(() => parse('- /')).toThrow();
       expect(() => parse('--')).toThrow();
-      expect(() => parse('//')).toThrow();
+      expect(() => parse('/ / ')).toThrow();
     });
 
-    it('should throw on empty brackets', () => {
+    it('should throw on immediately adjacent unsimilar brackets', () => {
       expect(() => parse('()')).toThrow();
+      expect(() => parse(')(')).toThrow();
+      expect(() => parse('(  )')).toThrow();
+      expect(() => parse(')  (')).toThrow();
     });
 
     it('should throw on invalid number of openning and closing brackets', () => {
       expect(() => parse(')')).toThrow();
-      expect(() => parse(')((')).toThrow();
-      expect(() => parse('((')).toThrow();
+      expect(() => parse(') ( (')).toThrow();
+      expect(() => parse('( (')).toThrow();
+    });
+
+    it('should throw on invalid number of openning and closing brackets', () => {
+      expect(() => parse(')')).toThrow();
+      expect(() => parse(') ( (')).toThrow();
+      expect(() => parse('( (')).toThrow();
+    });
+
+    it('should perform appropriate conversions', () => {
+      expect(parse('- .123 + 45')).toBe('-.123+45');
+      expect(parse('((-123 ) -( + 45))')).toBe('((-123)-(+45))');
     });
   });
 });

@@ -70,32 +70,27 @@ export default class ParserUtils {
    *  condenced (withowt spaces) string or undefined
    */
   static parseExpressionSimpleChecks(trimmed: string): string {
-    // check for invalid chars
     if (trimmed.match(/[^\d .+\-/*()]/)) {
-      throw new Error();
+      throw new Error('Invalid char');
     }
 
-    // check for spaces within numbers
     if (trimmed.match(/[\d.]\s+[\d.]/)) {
-      throw new Error();
+      throw new Error('Space within number');
     }
 
     // it is safe to remove spaces now
     const condenced = trimmed.replace(/\s/g, '');
 
-    // check for doubled actions
     if (condenced.match(/[-+/*][-+/*]/)) {
-      throw new Error();
+      throw new Error('Doubled actions');
     }
 
-    // check for emty brackets
-    if (condenced.match(/\(\)/)) {
-      throw new Error();
+    if (condenced.match(/(\(\)|\)\()/)) {
+      throw new Error('Immediately adjacent unsimilar brackets');
     }
 
-    // check for invalid number of openning and closing brackets
     if ((condenced.match(/\(/g) || []).length !== (condenced.match(/\)/g) || []).length) {
-      throw new Error();
+      throw new Error('Invalid number of openning and closing brackets');
     }
 
     return condenced;
@@ -110,15 +105,36 @@ export default class ParserUtils {
     return Infinity; // undefined;
 
     /*
-    содержит скобки?
+    1. если начальная позиция содержит * или ., то throw
+    2. если конечная позиция содержит *, /, + или -, то throw
+    3. находим позицию первой открывающейся скобки
+    4. найдена?
       + да
-        закрывающая скобка раньше отрывающаей?
+        4.1. находим позицию первой закрывающейся скобки
+        4.2. нашили?
           + да
-            throw
+            4.2.1. найденая позиция закрывающейся скобки раньше открывающейся?
+              + да
+                4.2.1.1. throw
+              - нет
+                4.2.1.2. нахоим позицию закрывающейся скобки, соответсвующей найденой открывающейся
+                4.2.1.3. найдена?
+                  + да
+                    4.2.1.3.1. пытаемся интерпретировать его как число
+                    4.2.1.3.2. получилось?
+                      +да
+                        4.2.1.3.2.1. находим следующую позицию первой открывающейся скобки по шагу 3 за ранее найденной позицией на этом шаге
+                      - нет
+                        4.2.1.3.2.2. обрабатываем строку внутри скобок, начиная с шага 1 (при ошибке парсиннга будет throw)
+                        4.2.1.3.2.3. получаем строку из полученного результата, если он отрицательный, то оборачиваем его скобками
+                        4.2.1.3.2.4. заменяем ранее найденную подстроку со скобками (шаги 4.1 и 4.2.1.2) на новую
+                        4.2.1.3.2.5. находим следующую позицию первой открывающейся скобки по шагу 3 за ранее найденной позицией на этом шаге
+                  - нет
+                    4.2.1.3.3. throw
           - нет
-            ...
-      - нет
-        обрабатываем группировку
+            4.2.2. throw
+      -нет
+        4.3. обрабатываем группу, не содержащую скобок (кроме скобок для отрицательных чисел) отельной процедурой
     */
   }
 }
