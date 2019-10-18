@@ -77,6 +77,33 @@ describe('utils', () => {
       expect(parse('1')).toBe(1);
       expect(parse('-01.4050')).toBe(-1.405);
     })
+
+    it('should parse valid numbers', () => {
+      expect(parse('-1 + 1')).toBe(0);
+      expect(parse('1 + 1')).toBe(2);
+      expect(parse('1 + (1)')).toBe(2);
+      expect(parse('(1) + 1')).toBe(2);
+      expect(parse('(-1) + 1')).toBe(0);
+      expect(parse('(-1) + (-1)')).toBe(-2);
+      expect(parse('(-1) - (-1)')).toBe(0);
+      expect(parse('1* 1 ')).toBe(1);
+      expect(parse('-(-1) + (2 +4)/(-2)')).toBe(-2);
+      expect(parse('5*96-4')).toBe(476);
+      expect(parse('5*(96)-4')).toBe(476);
+      expect(parse('5*(40+56)-4')).toBe(476);
+      expect(parse('20/5')).toBe(4);
+      expect(parse('40+56')).toBe(96);
+      expect(parse('5*(40+56)')).toBe(480);
+      expect(parse('5*(40+7*8)-20')).toBe(460);
+      expect(parse('1-1/1')).toBe(0);
+      expect(parse('1*1-1/1')).toBe(0);
+      expect(parse('5*96-20/5')).toBe(476);
+      expect(parse('5*(40+7*8)-20/5')).toBe(476);
+      expect(parse('5*(40+7*8)-20/(5)')).toBe(476);
+      expect(parse('5*(40+7*8)-20/(42-37)')).toBe(476);
+      expect(parse('1.2 - 1.2/6')).toBe(1);
+      // expect(parse('1/0')).toBe(Infinity);
+    })
   });
 
 
@@ -162,6 +189,19 @@ describe('utils', () => {
   });
 
 
+  describe('parseExpressionMultiplicationGroups', () => {
+    const parse = Utils.parseExpressionMultiplicationGroups;
+
+    it('should parse correctly', () => {
+      expect(parse('1+1')).toBe(2);
+      expect(parse('-1+1')).toBe(0);
+      expect(parse('(-1)+1')).toBe(0);
+      expect(parse('1*1')).toBe(1);
+      expect(parse('1*1-1/1')).toBe(0);
+    });
+  });
+
+
   describe('parseExpressionBrackets', () => {
     const parse = Utils.parseExpressionBrackets;
 
@@ -214,6 +254,7 @@ describe('utils', () => {
       expect(parse('3*2/(-1)*(-1)')).toBe(6);
       expect(parse('3*2/(-1)')).toBe(-6);
       expect(parse('(-3)*2/(-1)')).toBe(6);
+      expect(parse('1/0')).toBe(Infinity);
     });
   });
 
@@ -231,6 +272,7 @@ describe('utils', () => {
       expect(parse('+(-3)+2-1')).toBe(-2);
       expect(parse('11+42+(-11)')).toBe(42);
       expect(parse('(-11)-(-11)+1')).toBe(1);
+      expect(parse('-1+1')).toBe(0);
     });
   });
 });
