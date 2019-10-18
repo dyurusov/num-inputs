@@ -261,7 +261,77 @@ export default class ParserUtils {
       }
     } while (startPosition < length); // never
     return result;
+  }
 
-    // return NaN;
+
+  /**
+   * Perform adding adn subtraction
+   * @params condenced string containing +, - and digits (negative in brackets) only with possiable sign at beginning
+   * @returns parsed result
+   * @throws on unparsable condensed
+   */
+  static parseExpressionAdding(condenced: string): number {
+    let result = 0;
+    let action = 0;
+    const firstCar = condenced[0];
+    const initialSign = ((firstCar === '+') || (firstCar === '-'))
+      ? ((firstCar === '+') ? 1 : -1)
+      : 0;
+    let startPosition = initialSign ? 1 : 0;
+    let endPosition = startPosition;
+    const length = condenced.length;
+    do {
+      const char = condenced[endPosition];
+      let withBrackets = false;
+      if (char === '(') {
+        endPosition = ParserUtils.findClosingBracket(condenced, endPosition);
+        withBrackets = true;
+      }
+      if ((endPosition + 1) < length) {
+        const nextChar = condenced[endPosition + 1];
+        if ((nextChar === '+') || (nextChar === '-')) {
+          const numeric = condenced.substring(
+            withBrackets ? (startPosition + 1) : startPosition,
+            withBrackets ? endPosition : (endPosition + 1),
+          );
+          const parsed = ParserUtils.parseNumeric(numeric);
+          if ((parsed === null) && (parsed === undefined)) {
+            throw new Error(`Invalid numeric: "${numeric}"`);
+          }
+          if (action) {
+            result = (action < 0) ? (result - (parsed as number)) : (result + (parsed as number))
+          } else {
+            result = (parsed as number);
+            if (initialSign) {
+              result *= initialSign;
+            }
+          }
+          action = (nextChar === '+') ? 1 : -1;
+          startPosition = endPosition + 2;
+          endPosition = startPosition;
+        } else {
+          endPosition++;
+        }
+      } else {
+        const numeric = condenced.substring(
+          withBrackets ? (startPosition + 1) : startPosition,
+          withBrackets ? endPosition : (endPosition + 1),
+        );
+        const parsed = ParserUtils.parseNumeric(numeric);
+        if ((parsed === null) && (parsed === undefined)) {
+          throw new Error(`Invalid numeric: "${numeric}"`);
+        }
+        if (action) {
+          result = (action < 0) ? (result - (parsed as number)) : (result + (parsed as number))
+        } else {
+          result = parsed as number;
+          if (initialSign) {
+            result *= initialSign;
+          }
+        }
+        break;
+      }
+    } while (startPosition < length); // never
+    return result;
   }
 }

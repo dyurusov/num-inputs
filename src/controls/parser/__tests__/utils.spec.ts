@@ -216,4 +216,21 @@ describe('utils', () => {
       expect(parse('(-3)*2/(-1)')).toBe(6);
     });
   });
+
+
+  describe('parseExpressionAdding', () => {
+    const parse = Utils.parseExpressionAdding;
+
+    it('should add and substract', () => {
+      expect(parse('1+1')).toBe(2);
+      expect(parse('2-2')).toBe(0);
+      expect(parse('3-2+1')).toBe(2);
+      expect(parse('3+2-1')).toBe(4);
+      expect(parse('-3+2-1')).toBe(-2);
+      expect(parse('+3+2-1')).toBe(4);
+      expect(parse('+(-3)+2-1')).toBe(-2);
+      expect(parse('11+42+(-11)')).toBe(42);
+      expect(parse('(-11)-(-11)+1')).toBe(1);
+    });
+  });
 });
