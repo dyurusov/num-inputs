@@ -55,7 +55,7 @@ export default class ParserUtils {
 
     try {
       const condenced = ParserUtils.parseExpressionCondence((value as string).trim());
-      return ParserUtils.parseExpressionBrackets(condenced);
+      return ParserUtils.parseExpressionHandleBrackets(condenced);
     } catch (e) {
       return undefined;
     }
@@ -105,12 +105,12 @@ export default class ParserUtils {
 
 
   /**
-   * Handles brackets groups
+   * Parse brackets groups
    * @params condenced string containing (, ), *, /, -, +, . and digits onlu
    * @returns parsed result
    * @throws on unparsable condensed
    */
-  static parseExpressionBrackets(condenced: string): number {
+  static parseExpressionHandleBrackets(condenced: string): number {
     if (condenced.match(/^[*/]/)) {
       throw new Error('Multiplication or division on the first position');
     }
@@ -119,13 +119,18 @@ export default class ParserUtils {
       throw new Error('Multiplication, division, adding or substraction on the first position');
     }
 
+    // find brackets groups and replace by its value
+    let transformedCondenced = condenced;
     let curPosition = 0;
-    let newCondenced = condenced;
     do {
-      const opnPosition = newCondenced.indexOf('(', curPosition);
+      // position of the first opening bracket
+      const opnPosition = transformedCondenced.indexOf('(', curPosition);
       const opnIsFound = (opnPosition !== -1);
-      const firstClsPosition = newCondenced.indexOf(')', curPosition);
+
+      // position of the first closinging bracket
+      const firstClsPosition = transformedCondenced.indexOf(')', curPosition);
       const firstClsIsFound = (firstClsPosition !== -1);
+
       if (opnIsFound) {
         if (!firstClsIsFound) {
           throw new Error('No closing bracket');
@@ -133,34 +138,35 @@ export default class ParserUtils {
         if (opnPosition > firstClsPosition) {
           throw new Error('Closing bracket befor opening one');
         }
-        const clsPosition = ParserUtils.findClosingBracket(newCondenced, opnPosition);
-        const bracketsContent = newCondenced.substring(opnPosition + 1, clsPosition);
+
+        // find coresponding losing bracket and get its value
+        const clsPosition = ParserUtils.findClosingBracket(transformedCondenced, opnPosition);
+        const bracketsContent = transformedCondenced.substring(opnPosition + 1, clsPosition);
         const numericBracketsContent = ParserUtils.parseNumeric(bracketsContent);
         if (numericBracketsContent === null) {
           throw new Error('Empty numeric');
         }
-        let newBracketsContent = '';
-        if (numericBracketsContent === undefined) {
-          const parsedBracketsContent = ParserUtils.parseExpressionBrackets(bracketsContent);
-          newBracketsContent = (parsedBracketsContent < 0)
-            ? `(${parsedBracketsContent})`
-            : parsedBracketsContent.toString();
-        } else {
-          newBracketsContent = (numericBracketsContent < 0)
-            ? `(${numericBracketsContent})`
-            : numericBracketsContent.toString();
-        }
-        newCondenced = newCondenced.substring(0, opnPosition)
-        + newBracketsContent + newCondenced.substr(clsPosition + 1);
-        curPosition = opnPosition + newBracketsContent.length + 1;
+        const calculatedBracketsContent = (numericBracketsContent === undefined)
+          ? ParserUtils.parseExpressionHandleBrackets(bracketsContent)
+          : numericBracketsContent;
+        const bracketsValue = ((calculatedBracketsContent < 0)
+          ? `(${calculatedBracketsContent})`
+          : calculatedBracketsContent).toString();
+
+        // replace found brackets group by its value
+        transformedCondenced = transformedCondenced.substring(0, opnPosition)
+        + bracketsValue + transformedCondenced.substr(clsPosition + 1);
+
+        curPosition = opnPosition + bracketsValue.length + 1;
       } else {
         if (firstClsIsFound) {
           throw new Error('Closing bracket without opening one');
         }
         break;
       }
-    } while (curPosition < newCondenced.length); // loop is never broken by this condition
-    return ParserUtils.parseExpressionMultiplicationGroups(newCondenced);
+    } while (curPosition < transformedCondenced.length); // loop is never broken by this condition
+
+    return ParserUtils.parseExpressionMultiplicationGroups(transformedCondenced);
   }
 
 

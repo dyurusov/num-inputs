@@ -78,7 +78,7 @@ describe('utils', () => {
       expect(parse('-01.4050')).toBe(-1.405);
     })
 
-    it('should parse valid numbers', () => {
+    it('should parse as valid numbers', () => {
       expect(parse('-1 + 1')).toBe(0);
       expect(parse('1 + 1')).toBe(2);
       expect(parse('1 + (1)')).toBe(2);
@@ -102,7 +102,8 @@ describe('utils', () => {
       expect(parse('5*(40+7*8)-20/(5)')).toBe(476);
       expect(parse('5*(40+7*8)-20/(42-37)')).toBe(476);
       expect(parse('1.2 - 1.2/6')).toBe(1);
-      // expect(parse('1/0')).toBe(Infinity);
+      expect(parse('(1+ (1.2- 4)/3.8 +78)/15 - 3*(34-78.9)')).toBeCloseTo(139.91754386);
+      expect(parse('-(1+ (1.2- 4)/3.8 +78)/15 + 3*(34-78.9)')).toBeCloseTo(-139.91754386);
     })
   });
 
@@ -202,8 +203,8 @@ describe('utils', () => {
   });
 
 
-  describe('parseExpressionBrackets', () => {
-    const parse = Utils.parseExpressionBrackets;
+  describe('parseExpressionHandleBrackets', () => {
+    const parse = Utils.parseExpressionHandleBrackets;
 
     it('should throw on * or / in the first position', () => {
       expect(() => parse('*123')).toThrow();
