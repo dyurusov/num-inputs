@@ -190,8 +190,8 @@ describe('utils', () => {
   });
 
 
-  describe('parseExpressionMultiplicationGroups', () => {
-    const parse = Utils.parseExpressionMultiplicationGroups;
+  describe('parseExpressionHandleMultiplicationGroups', () => {
+    const parse = Utils.parseExpressionHandleMultiplicationGroups;
 
     it('should parse correctly', () => {
       expect(parse('1+1')).toBe(2);

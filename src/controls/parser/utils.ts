@@ -119,7 +119,7 @@ export default class ParserUtils {
       throw new Error('Multiplication, division, adding or substraction on the first position');
     }
 
-    // find brackets groups and replace by its value
+    // find first level brackets groups and replace them by its value
     let transformedCondenced = condenced;
     let curPosition = 0;
     do {
@@ -146,27 +146,27 @@ export default class ParserUtils {
         if (numericBracketsContent === null) {
           throw new Error('Empty numeric');
         }
-        const calculatedBracketsContent = (numericBracketsContent === undefined)
+        const calculatedBracketsValue = (numericBracketsContent === undefined)
           ? ParserUtils.parseExpressionHandleBrackets(bracketsContent)
           : numericBracketsContent;
-        const bracketsValue = ((calculatedBracketsContent < 0)
-          ? `(${calculatedBracketsContent})`
-          : calculatedBracketsContent).toString();
+        const bracketsValueString = ((calculatedBracketsValue < 0)
+          ? `(${calculatedBracketsValue})`
+          : calculatedBracketsValue).toString();
 
         // replace found brackets group by its value
         transformedCondenced = transformedCondenced.substring(0, opnPosition)
-        + bracketsValue + transformedCondenced.substr(clsPosition + 1);
+        + bracketsValueString + transformedCondenced.substr(clsPosition + 1);
 
-        curPosition = opnPosition + bracketsValue.length + 1;
+        curPosition = opnPosition + bracketsValueString.length + 1;
       } else {
         if (firstClsIsFound) {
           throw new Error('Closing bracket without opening one');
         }
         break;
       }
-    } while (curPosition < transformedCondenced.length); // loop is never broken by this condition
+    } while (true); // eslint-disable-line no-constant-condition
 
-    return ParserUtils.parseExpressionMultiplicationGroups(transformedCondenced);
+    return ParserUtils.parseExpressionHandleMultiplicationGroups(transformedCondenced);
   }
 
 
@@ -204,7 +204,7 @@ export default class ParserUtils {
    * @returns parsed result
    * @throws on unparsable condensed
    */
-  static parseExpressionMultiplicationGroups(condenced: string): number {
+  static parseExpressionHandleMultiplicationGroups(condenced: string): number {
     const initialParsed = ParserUtils.parseNumeric(condenced);
     if (initialParsed === null) {
       throw new Error('Empty numeric');
@@ -212,45 +212,44 @@ export default class ParserUtils {
       return (initialParsed as number);
     }
 
-    const firstCar = condenced[0];
+    // scan for multiplication/division groups and replace them by its value
+    let transformedCondenced = condenced
+    const firstCar = condenced[0];  // handle leading sign if it exists
     const initialSign = ((firstCar === '+') || (firstCar === '-'))
       ? ((firstCar === '+') ? 1 : -1)
       : 0;
     let startPosition = initialSign ? 1 : 0;
     let endPosition = startPosition;
-    let newCondenced = condenced
     do {
-      const char = newCondenced[endPosition];
+      const char = transformedCondenced[endPosition];
+
+      // skip possiable breakets with negative value
       if (char === '(') {
-        endPosition = ParserUtils.findClosingBracket(newCondenced, endPosition);
+        endPosition = ParserUtils.findClosingBracket(transformedCondenced, endPosition);
       }
-      if ((endPosition + 1) < newCondenced.length) {
-        const nextChar = newCondenced[endPosition + 1];
-        if ((nextChar === '+') || (nextChar === '-')) {
-          const numeric = newCondenced.substring(startPosition, endPosition + 1);
-          const parsed = ParserUtils.parseExpressionMultiply(numeric);
-          const parsedSubstitution = (parsed < 0)
-            ? `(${parsed})`
-            : parsed.toString();
-          newCondenced = newCondenced.substring(0, startPosition)
-            + parsedSubstitution + newCondenced.substr(endPosition + 1);
-          startPosition = startPosition + (parsedSubstitution as string).length + 1;
-          endPosition = startPosition;
-        } else {
+
+      // check fot next + or -
+      if ((endPosition + 1) < transformedCondenced.length) {
+        const nextChar = transformedCondenced[endPosition + 1];
+        if ((nextChar !== '+') && (nextChar !== '-')) {
           endPosition++;
+          continue;
         }
-      } else {
-        const numeric = newCondenced.substring(startPosition, newCondenced.length);
-        const parsed = ParserUtils.parseExpressionMultiply(numeric);
-        const parsedSubstitution = (parsed < 0)
-          ? `(${parsed})`
-          : parsed.toString();
-        newCondenced = newCondenced.substring(0, startPosition)
-          + parsedSubstitution; // + newCondenced.substr(endPosition + 1);
-        break;
       }
-    } while (startPosition < newCondenced.length); // never
-    return ParserUtils.parseExpressionAdding(newCondenced);
+
+      // replace found group by its value
+      const numeric = transformedCondenced.substring(startPosition, endPosition + 1);
+      const parsed = ParserUtils.parseExpressionMultiply(numeric);
+      const parsedSubstitution = (parsed < 0)
+        ? `(${parsed})`
+        : parsed.toString();
+      transformedCondenced = transformedCondenced.substring(0, startPosition)
+        + parsedSubstitution + transformedCondenced.substr(endPosition + 1);
+      startPosition = startPosition + (parsedSubstitution as string).length + 1;
+      endPosition = startPosition;
+    } while (startPosition < transformedCondenced.length);
+
+    return ParserUtils.parseExpressionAdding(transformedCondenced);
   }
 
 
