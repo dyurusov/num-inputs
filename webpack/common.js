@@ -1,17 +1,17 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+// const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 
 module.exports = {
   entry: path.resolve(__dirname, '../src/index.js'),
   output: {
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(__dirname, '../docs'),
     filename: 'num-inputs.js',
     // library: 'numInputs'
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       title: 'numInputs',
       template: path.resolve(__dirname, '../src/index.html'),

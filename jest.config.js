@@ -1,6 +1,6 @@
 var testPathIgnorePatterns = [
   '/node_modules/',
-  '<rootDir>/dist/',
+  '<rootDir>/docs/',
   '\\.helpers?\\.[jt]sx?$',
 ];
 
