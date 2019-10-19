@@ -41,7 +41,7 @@
   "scripts": {
     "devel": "NODE_ENV=development webpack-dev-server --config webpack/devel.js",
     "build": "NODE_ENV=production webpack --config webpack/prod.js",
-    "lint": "eslint --ext tsx --ext ts --ext .jsx --ext .js ./src ",
+    "lint": "eslint --ext .tsx --ext .ts --ext .jsx --ext .js ./src ",
     "prettier": "prettier",
     "test": "jest",
     "test:watch": "jest --watch"
