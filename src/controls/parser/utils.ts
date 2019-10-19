@@ -205,21 +205,18 @@ export default class ParserUtils {
    * @throws on unparsable condensed
    */
   static parseExpressionHandleMultiplicationGroups(condenced: string): number {
-    const initialParsed = ParserUtils.parseNumeric(condenced);
-    if (initialParsed === null) {
-      throw new Error('Empty numeric');
-    } else if (initialParsed !== undefined) {
-      return (initialParsed as number);
-    }
-
-    // scan for multiplication/division groups and replace them by its value
     let transformedCondenced = condenced
-    const firstCar = condenced[0];  // handle leading sign if it exists
+
+    // handle leading sign if it exists
+    const firstCar = transformedCondenced[0];
     const initialSign = ((firstCar === '+') || (firstCar === '-'))
       ? ((firstCar === '+') ? 1 : -1)
       : 0;
+
     let startPosition = initialSign ? 1 : 0;
     let endPosition = startPosition;
+
+    // scan for multiplication/division groups and replace them by its value
     do {
       const char = transformedCondenced[endPosition];
 
@@ -254,70 +251,65 @@ export default class ParserUtils {
 
 
   /**
-   * Perform multiplicatipn adn division
+   * Perform multiplicatipn and division
    * @params condenced string containing *, / and digits (negative in brackets) only
    * @returns parsed result
    * @throws on unparsable condensed
    */
   static parseExpressionMultiply(condenced: string): number {
-    const initialParsed = ParserUtils.parseNumeric(condenced);
-    if (initialParsed === null) {
-      throw new Error('Empty numeric');
-    } else if (initialParsed !== undefined) {
-      return (initialParsed as number);
-    }
-
-    let result = 1;
-    let action = 0;
+    let result = 0;
+    let action = 0; // 0 if not parsed so far, less then 0 for devision and greater then 0 for multiplication
     let startPosition = 0;
     let endPosition = startPosition;
     const length = condenced.length;
+
+    // scan for * or / and perform appropriate actions
     do {
       const char = condenced[endPosition];
+
+      // skip possiable breakets with negative value
       let withBrackets = false;
       if (char === '(') {
         endPosition = ParserUtils.findClosingBracket(condenced, endPosition);
         withBrackets = true;
       }
+
+      // check fot next * or /
+      let nextChar;
       if ((endPosition + 1) < length) {
-        const nextChar = condenced[endPosition + 1];
-        if ((nextChar === '*') || (nextChar === '/')) {
-          const numeric = condenced.substring(
-            withBrackets ? (startPosition + 1) : startPosition,
-            withBrackets ? endPosition : (endPosition + 1),
-          );
-          const parsed = ParserUtils.parseNumeric(numeric);
-          if ((parsed === null) && (parsed === undefined)) {
-            throw new Error(`Invalid numeric: "${numeric}"`);
-          }
-          if (action) {
-            result = (action < 0) ? (result / (parsed as number)) : (result * (parsed as number))
-          } else {
-            result = parsed as number;
-          }
-          action = (nextChar === '*') ? 1 : -1;
-          startPosition = endPosition + 2;
-          endPosition = startPosition;
-        } else {
+        nextChar = condenced[endPosition + 1];
+        if ((nextChar !== '*') && (nextChar !== '/')) {
           endPosition++;
+          continue;
         }
-      } else {
-        const numeric = condenced.substring(
-          withBrackets ? (startPosition + 1) : startPosition,
-          withBrackets ? endPosition : (endPosition + 1),
-        );
-        const parsed = ParserUtils.parseNumeric(numeric);
-        if ((parsed === null) && (parsed === undefined)) {
-          throw new Error(`Invalid numeric: "${numeric}"`);
-        }
-        if (action) {
-          result = (action < 0) ? (result / (parsed as number)) : (result * (parsed as number))
-        } else {
-          result = parsed as number;
-        }
-        break;
       }
-    } while (startPosition < length); // never
+
+      // separate token and parse it
+      const token = condenced.substring(
+        withBrackets ? (startPosition + 1) : startPosition,
+        withBrackets ? endPosition : (endPosition + 1),
+      );
+      const parsedToken = ParserUtils.parseNumeric(token);
+      if ((parsedToken === null) && (parsedToken === undefined)) {
+        throw new Error(`Invalid numeric: "${token}"`);
+      }
+
+      // perform action
+      if (action) {
+        result = (action < 0)
+          ? (result / (parsedToken as number))
+          : (result * (parsedToken as number));
+      } else {
+        result = (parsedToken as number);
+      }
+
+      if (nextChar) {
+        action = (nextChar === '*') ? 1 : -1;
+      }
+      startPosition = endPosition + 2;
+      endPosition = startPosition;
+    } while (endPosition < length);
+
     return result;
   }
 
@@ -329,13 +321,6 @@ export default class ParserUtils {
    * @throws on unparsable condensed
    */
   static parseExpressionAdding(condenced: string): number {
-    const initialParsed = ParserUtils.parseNumeric(condenced);
-    if (initialParsed === null) {
-      throw new Error('Empty numeric');
-    } else if (initialParsed !== undefined) {
-      return (initialParsed as number);
-    }
-
     let result = 0;
     let action = 0;
     const firstCar = condenced[0];
